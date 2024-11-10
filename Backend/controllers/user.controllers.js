@@ -108,6 +108,8 @@ export const updateUserProfile = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+
+        //Password update validation
         if ((!newPassword && currentPassword) || (!currentPassword && newPassword)) {
             return res.status(400).json({ error: "Please provide current password and new password" });
         }
@@ -123,6 +125,8 @@ export const updateUserProfile = async (req, res) => {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(newPassword, salt);
         }
+
+        //Profile Image Handling(using Cloudinary for storage)
         if (profileImg) {
             if (user.profileImg) {
                 await cloudinary.uploader.destroy(user.profileImg.split("/").pop().split(".")[0]);
@@ -130,6 +134,7 @@ export const updateUserProfile = async (req, res) => {
             const uploadResult = await cloudinary.uploader.upload(profileImg);
             profileImg = uploadResult.secure_url;
         }
+        //Cover Image Handling (using Cloudinary for storage)
         if (coverImg) {
             if (user.coverImg) {
                 await cloudinary.uploader.destroy(user.profileImg.split("/").pop().split(".")[0]);
@@ -138,6 +143,7 @@ export const updateUserProfile = async (req, res) => {
             coverImg = uploadResult.secure_url;
         }
 
+        //Update User Profile Fields
         user.fullName = fullName || user.fullName;
         user.email = email || user.email;
         user.username = username || user.username;
