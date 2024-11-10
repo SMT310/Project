@@ -9,7 +9,6 @@ export const getUserProfile = async (req, res) => {
 
     try {
         const user = await User.findOne({ username }).select("-password");
-        console.log("User: ", user);
         if (!user) {
             res.status(404).json({ message: "User not found" });
         }
@@ -151,7 +150,6 @@ export const updateUserProfile = async (req, res) => {
 
         // password should be null in response
         user.password = null;
-        console.log(user.password);
 
         return res.status(200).json(user);
     } catch (error) {
