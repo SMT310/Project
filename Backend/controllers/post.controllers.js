@@ -1,6 +1,7 @@
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
+import { v2 as cloudinary } from "cloudinary";
 
 
 export const createPost = async (req, res) => {
@@ -129,11 +130,11 @@ export const deletePost = async (req, res) => {
 
 export const commentPost = async (req, res) => {
     try {
-        const { text } = req.body;
+        const { text, img } = req.body;
         const postId = req.params.id;
         const userId = req.user._id.toString();
-        if (!text) {
-            return res.status(400).json({ error: "Text field is required" });
+        if (!text && !img) {
+            return res.status(400).json({ error: "Comment must have either text or an image" });
         }
 
         const post = await Post.findById(postId);
@@ -141,7 +142,16 @@ export const commentPost = async (req, res) => {
             return res.status(404).json({ error: "Post not found" });
         }
 
-        const comment = { user: userId, text };
+        let imageUrl = '';
+        if (img) {
+            const uploadResponse = await cloudinary.uploader.upload(img, {
+                resource_type: 'auto' // Automatically detects image/video type
+            });
+
+            imageUrl = uploadResponse.secure_url;  // The URL of the uploaded image
+        }
+
+        const comment = { user: userId, text, img: imageUrl };
         post.comments.push(comment);
         await post.save();
 
@@ -201,7 +211,7 @@ export const getFollowingPosts = async (req, res) => {
                 path: "comments.user",
                 select: "-password"
             })
-        
+
         res.status(200).json(feedPosts);
     } catch (error) {
         console.log("Error getFollowingPosts controller", error.message);
@@ -227,7 +237,7 @@ export const getUserPosts = async (req, res) => {
                 path: "comments.user",
                 select: "-password"
             })
-        
+
         res.status(200).json(posts);
     } catch (error) {
         console.log("Error getUserPosts controller", error.message);
