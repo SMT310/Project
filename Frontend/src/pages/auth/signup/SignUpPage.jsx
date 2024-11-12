@@ -3,9 +3,9 @@ import { useState } from "react";
 
 import XSvg from "../../../components/svgs/X";
 
-import { MdOutlineMail } from "react-icons/md";
-import { FaUser } from "react-icons/fa";
-import { MdPassword } from "react-icons/md";
+import { IoIosMail } from "react-icons/io";
+import { RiMapPinUserFill } from "react-icons/ri";
+import { IoMdKey } from "react-icons/io";
 import { MdDriveFileRenameOutline } from "react-icons/md";
 
 const SignUpPage = () => {
@@ -35,9 +35,9 @@ const SignUpPage = () => {
 			<div className='flex-1 flex flex-col justify-center items-center'>
 				<form className='lg:w-2/3  mx-auto md:mx-20 flex gap-4 flex-col' onSubmit={handleSubmit}>
 					<XSvg className='w-24 lg:hidden fill-white' />
-					<h1 className='text-4xl font-extrabold text-white'>Join today.</h1>
+					<h1 className='text-4xl font-extrabold text-white'>Sign up today</h1>
 					<label className='input input-bordered rounded flex items-center gap-2'>
-						<MdOutlineMail />
+						<IoIosMail />
 						<input
 							type='email'
 							className='grow'
@@ -49,7 +49,7 @@ const SignUpPage = () => {
 					</label>
 					<div className='flex gap-4 flex-wrap'>
 						<label className='input input-bordered rounded flex items-center gap-2 flex-1'>
-							<FaUser />
+							<RiMapPinUserFill />
 							<input
 								type='text'
 								className='grow '
@@ -72,7 +72,7 @@ const SignUpPage = () => {
 						</label>
 					</div>
 					<label className='input input-bordered rounded flex items-center gap-2'>
-						<MdPassword />
+						<IoMdKey />
 						<input
 							type='password'
 							className='grow'
