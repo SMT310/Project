@@ -14,21 +14,25 @@ export const createPost = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        if (!text && !img) {
+        if (!text && (!img || (Array.isArray(img) && img.length === 0))) {
             return res.status(400).json({ error: "Post must have text or image" });
         }
+        // Ensure img is always an array, even if it's a single image
+        const imagesArray = Array.isArray(img) ? img : img ? [img] : [];
 
-        //Image Upload Handling (using Cloudinary for storage)
-        if (img) {
-            const uploadResult = await cloudinary.uploader.upload(img);
-            img = uploadResult.secure_url;
-        }
+        // Image upload handling
+        const imgUrls = await Promise.all(
+            imagesArray.map(async (image) => {
+                const uploadResult = await cloudinary.uploader.upload(image);
+                return uploadResult.secure_url;
+            })
+        );
 
         //Create a new Post
         const newPost = new Post({
             user: userId,
             text,
-            img
+            img: imgUrls.length > 0 ? imgUrls : undefined
         })
 
         await newPost.save();
@@ -113,9 +117,18 @@ export const deletePost = async (req, res) => {
             return res.status(401).json({ error: "You are not authorized to delete this post" });
         }
 
-        //Delete image from Cloudinary (if the post has an image)
-        if (post.img) {
-            await cloudinary.uploader.destroy(post.img.split("/").pop().split(".")[0]);
+        // Delete images from Cloudinary if the post has any images
+        if (Array.isArray(post.img)) {
+            // Handle multiple images
+            const deletePromises = post.img.map(imageUrl => {
+                const publicId = imageUrl.split("/").pop().split(".")[0];
+                return cloudinary.uploader.destroy(publicId);
+            });
+            await Promise.all(deletePromises);
+        } else if (post.img) {
+            // Handle single image case (if img was a string)
+            const publicId = post.img.split("/").pop().split(".")[0];
+            await cloudinary.uploader.destroy(publicId);
         }
 
         //Delete the post from the database
