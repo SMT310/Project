@@ -42,21 +42,39 @@ export const followUnfollowUser = async (req, res) => {
             await User.findByIdAndUpdate(id, { $pull: { followers: req.user._id } });
             await User.findByIdAndUpdate(req.user._id, { $pull: { following: id } });
 
+            await Notification.deleteOne({
+                type: 'follow',
+                from: req.user._id,
+                to: userToModify._id,
+            });
+
             //Send notification to user
-            res.status(200).json({ message: "user unfollowed successfully" });
+            const updatedComments = userToModify.followers.filter((id) => id.toString() !== req.user._id.toString());
+            res.status(200).json(updatedComments);
         } else {
             //Follow user
             await User.findByIdAndUpdate(id, { $push: { followers: req.user._id } });
             await User.findByIdAndUpdate(req.user._id, { $push: { following: id } });
 
-            //Create and save notification
-            const newNotification = new Notification({
-                type: 'follow',
+            // Check if follow notification already exists
+            const existingNotification = await Notification.findOne({
                 from: req.user._id,
-                to: userToModify._id
+                to: userToModify._id,
+                type: 'follow',
             });
-            await newNotification.save();
-            res.status(200).json({ message: "user followed successfully" });
+
+            // Only create a new notification if it doesn't exist
+            if (!existingNotification) {
+                const newNotification = new Notification({
+                    from: req.user._id,
+                    to: userToModify._id,
+                    type: 'follow',
+                });
+                await newNotification.save();
+            }
+
+            const updatedComments = userToModify._id
+            res.status(200).json(updatedComments);
         }
     } catch (error) {
         console.log("Error followUnfollowUser controller", error.message);

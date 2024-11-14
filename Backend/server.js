@@ -12,6 +12,7 @@ import connectMongoDB from "./db/connectMongoDB.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
+
 dotenv.config();
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

@@ -59,6 +59,14 @@ export const likeDislikePost = async (req, res) => {
             await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
             await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
 
+            // Remove the existing like notification
+            await Notification.deleteOne({
+                from: userId,
+                to: post.user,
+                type: "like",
+                post: postId, // Use `post` field here instead of `postId`
+            });
+            
             const updatedLikes = post.likes.filter((id) => id.toString() !== userId.toString());
             res.status(200).json(updatedLikes);
         } else {
@@ -67,12 +75,25 @@ export const likeDislikePost = async (req, res) => {
             await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
             await post.save();
 
-            const notification = new Notification({
-                from: userId,
-                to: post.user,
-                type: "like"
-            })
-            await notification.save();
+            // const notification = new Notification({
+            //     from: userId,
+            //     to: post.user,
+            //     type: "like"
+            // })
+            // await notification.save();
+
+            // Check if a notification already exists to prevent duplicates
+            const existingNotification = await Notification.findOne({ from: userId, to: post.user, type: "like", postId });
+            if (!existingNotification) {
+                // Create a new like notification if one does not already exist
+                const notification = new Notification({
+                    from: userId,
+                    to: post.user,
+                    type: "like",
+                    post: postId,
+                });
+                await notification.save();
+            }
 
             const updatedLikes = post.likes;
             res.status(200).json(updatedLikes);
@@ -178,7 +199,8 @@ export const commentPost = async (req, res) => {
         })
         await notification.save();
 
-        res.status(200).json(post);
+        const updatedComments = post.comments;
+        res.status(200).json(updatedComments);
     } catch (error) {
         console.log("Error commentPost controller", error.message);
         res.status(500).json({ error: error.message });
