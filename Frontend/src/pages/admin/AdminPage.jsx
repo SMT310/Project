@@ -24,7 +24,7 @@ const AdminPage = () => {
                 <main className="content">
                     <Topbar setIsSidebar={setIsSidebar} />
                     <Routes>
-                        <Route path="/" element={<Team />} />
+                        {/* <Route path="/" element={<Team />} /> */}
                         <Route path="/team" element={<Team />} />
                         <Route path="/form" element={<Form />} />
                     </Routes>
