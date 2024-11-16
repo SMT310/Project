@@ -67,6 +67,10 @@ const CreatePost = () => {
 		setImages((prevImages) => prevImages.filter((_, i) => i !== index));
 	};
 
+	if (!authUser) {
+		return <div>Loading...</div>; // Or any other loading state for authUser
+	}
+	
 	return (
 		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
 			<div className='avatar'>

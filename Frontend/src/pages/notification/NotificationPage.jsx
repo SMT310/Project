@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import RightPanel from "../../components/common/RightPanel";
+import Sidebar from "../../components/common/Sidebar";
 
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
@@ -58,6 +60,9 @@ const NotificationPage = () => {
 
 	return (
 		<>
+			<div className='flex max-w-6xl mx-auto p-0'>
+				<Sidebar />
+			</div>
 			<div className='flex-[4_4_0] border-l border-r border-gray-700 min-h-screen'>
 				<div className='flex justify-between items-center p-4 border-b border-gray-700'>
 					<p className='font-bold'>Notifications</p>
@@ -111,6 +116,9 @@ const NotificationPage = () => {
 						</div>
 					</div>
 				))}
+			</div>
+			<div className='flex max-w-6xl mx-auto p-0'>
+				<RightPanel />
 			</div>
 		</>
 	);

@@ -12,6 +12,9 @@ import { MdEdit } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/date";
 
+import RightPanel from "../../components/common/RightPanel";
+import Sidebar from "../../components/common/Sidebar";
+
 import useFollow from "../../hooks/useFollow";
 import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
 
@@ -68,6 +71,9 @@ const ProfilePage = () => {
 
 	return (
 		<>
+			<div className='flex max-w-6xl mx-auto p-0'>
+				<Sidebar />
+			</div>
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
 				{/* HEADER */}
 				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
@@ -222,6 +228,9 @@ const ProfilePage = () => {
 						<Posts feedType={feedType} username={username} userId={user?._id} />
 					</div>
 				</div>
+			</div>
+			<div className='flex max-w-6xl mx-auto p-0'>
+				<RightPanel />
 			</div>
 		</>
 	);

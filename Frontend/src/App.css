@@ -40,3 +40,15 @@
 .read-the-docs {
   color: #888;
 }
+
+.app {
+  display: flex;
+  height: 100vh;
+  /* Ensure the app takes the full viewport height */
+}
+
+.content {
+  height: 100%;
+  width: 80%;
+  font-family: "Source Sans Pro", sans-serif;
+}

@@ -3,7 +3,7 @@ import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
 import LoadingSpinner from "./LoadingSpinner";
 import useFollow from "../../hooks/useFollow"
 import { useQuery } from "@tanstack/react-query";
-
+import { useState } from "react";
 const RightPanel = () => {
 	const { data: suggestedUsers, isLoading } = useQuery({
 		queryKey: ["suggestedUsers"],
@@ -21,7 +21,33 @@ const RightPanel = () => {
 		},
 	});
 
+	const { data: allUsers } = useQuery({
+		queryKey: ["allUsers"],
+		queryFn: async () => {
+			try {
+				const res = await fetch("/api/users/all", {
+					method: "POST"
+				});
+				const data = await res.json();
+				if (!res.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+				return data;
+			} catch (error) {
+				throw new Error(error.message);
+			}
+		},
+	});
+
 	const { follow, isPending } = useFollow();
+	const [query, setQuery] = useState("");
+	const [showDropdown, setShowDropdown] = useState(false);
+
+	const filteredUsers = allUsers?.filter(
+		(user) =>
+			user.fullName.toLowerCase().includes(query.toLowerCase()) ||
+			user.username.toLowerCase().includes(query.toLowerCase())
+	);
 
 	if (suggestedUsers?.length === 0) return <div className='md:w-64 w-0'></div>;
 
@@ -29,7 +55,18 @@ const RightPanel = () => {
 		<div className='hidden lg:block my-4 mx-2'>
 			<div className="sticky top-2 z-20  p-4 rounded-md mb-4">
 				<label className="input input-bordered flex items-center gap-2 mb-4">
-					<input type="text" className="grow" placeholder="Search" />
+					<input
+						type="text"
+						className="grow"
+						placeholder="Search here"
+						value={query}
+						onChange={(e) => {
+							setQuery(e.target.value);
+							setShowDropdown(e.target.value !== "");
+						}}
+						onFocus={() => setShowDropdown(query !== "")}
+						onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+					/>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 16 16"
@@ -41,6 +78,38 @@ const RightPanel = () => {
 							clipRule="evenodd" />
 					</svg>
 				</label>
+				{showDropdown && (
+					<div className="absolute bg-[#16181C] shadow-lg rounded-md mt-2 w-full max-h-60 overflow-y-auto z-50">
+						{filteredUsers.length > 0 ? (
+							filteredUsers.map((user) => (
+								<Link
+									to={`/profile/${user.username}`}
+									className="flex items-center gap-2 p-2 hover:bg-[#2d3339] cursor-pointer"
+									key={user._id}
+								>
+									<div className="avatar">
+										<div className="w-8 h-8 rounded-full">
+											<img
+												src={user.profileImg || "/avatar-placeholder.png"}
+												alt={user.fullName}
+											/>
+										</div>
+									</div>
+									<div className="flex flex-col leading-tight">
+										<span className="font-semibold truncate">
+											{user.fullName}
+										</span>
+										<span className="text-sm text-gray-500">
+											@{user.username}
+										</span>
+									</div>
+								</Link>
+							))
+						) : (
+							<p className="p-2 text-sm text-gray-500">No results found</p>
+						)}
+					</div>
+				)}
 			</div>
 			<div className='bg-[#16181C] p-4 rounded-md sticky top-20'>
 				<p className='font-bold text-left mb-4'>Who to follow</p>

@@ -10,7 +10,7 @@ export const getUserProfile = async (req, res) => {
     try {
         const user = await User.findOne({ username }).select("-password");
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found", user: null });
         }
         res.status(200).json(user);
     } catch (error) {
@@ -92,7 +92,8 @@ export const getSuggestedUsers = async (req, res) => {
         const users = await User.aggregate([
             {
                 $match: {
-                    _id: { $ne: userId }    //Exclude the current user
+                    _id: { $ne: userId },
+                    role: { $ne: "admin" }//Exclude the current user
                 }
             },
             {
@@ -181,3 +182,45 @@ export const updateUserProfile = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//Search User
+export const searchUser = async (req, res) => {
+    const { query } = req.query; // The search query from the request
+
+    if (!query) {
+        return res.status(400).json({ message: "Search query is required" });
+    }
+
+    try {
+        const regex = new RegExp(query, "i"); // Create a case-insensitive regex
+
+        // Search users by username, fullName, or email
+        const users = await User.find({
+            $or: [
+                { username: { $regex: regex } },
+                { fullName: { $regex: regex } },
+                // { email: { $regex: regex } },
+            ],
+        }).select("-password"); // Exclude the password from the result
+
+        if (!users.length) {
+            return res.status(404).json({ message: "No users found" });
+        }
+
+        res.status(200).json(users);
+    } catch (error) {
+        console.log("Error searchUser controller", error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+//Get All User
+export const getAllUser = async (req, res) => {
+    try {
+        const users = await User.find({ role: "user" }).select("-password");
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("Error in getAllUser controller:", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}

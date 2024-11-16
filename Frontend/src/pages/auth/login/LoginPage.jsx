@@ -14,6 +14,8 @@ const LoginPage = () => {
 		username: "",
 		password: "",
 	});
+	const [userType, setUserType] = useState(false);
+
 
 	const queryClient = useQueryClient();
 	const { mutate: loginMutation, isPending, isError, error, } = useMutation({
@@ -83,6 +85,26 @@ const LoginPage = () => {
 							value={formData.password}
 						/>
 					</label>
+					{/* <div className="flex justify-between items-center mx-0 mb-4 gap-4">
+						<label htmlFor="User" className="flex items-center gap-2">
+							User:
+							<input
+								type="radio"
+								id="User"
+								name="gender"
+								defaultChecked
+							/>
+						</label>
+
+						<label htmlFor="Admin" className="flex items-center gap-2">
+							Admin:
+							<input
+								type="radio"
+								id="Admin"
+								name="gender"
+							/>
+						</label>
+					</div> */}
 					<button className='btn rounded-full btn-primary text-white'>
 						{isPending ? "Loading..." : "Login"}
 					</button>
