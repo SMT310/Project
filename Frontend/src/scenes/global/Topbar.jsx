@@ -2,18 +2,15 @@ import { Box, IconButton, useTheme } from "@mui/material";
 import { useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 import { ColorModeContext, tokens } from "../../utils/db/theme";
-import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import { BiLogOut } from "react-icons/bi";
 
 const Topbar = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
@@ -37,6 +34,8 @@ const Topbar = () => {
     onSuccess: () => {
       toast.success("Logout successfully");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
+      navigate("/login");
+      localStorage.removeItem("authUser");
     },
     onError: () => {
       toast.error("Logout failed");

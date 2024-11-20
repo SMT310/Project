@@ -2,37 +2,30 @@ import { FaComments } from "react-icons/fa6";
 import { AiFillLike } from "react-icons/ai";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import { FaEdit } from "react-icons/fa";
 
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
 
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
-
-	const [isEditing, setIsEditing] = useState(false); // To track if editing modal is open
-	const [editingComment, setEditingComment] = useState(null); // Store the comment being edited
-	const [editText, setEditText] = useState(""); // For updated text
-	const [editImg, setEditImg] = useState(null); // For updated image (if needed)
-
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-
 	const queryClient = useQueryClient();
-
 	const postOwner = post.user;
 	const isLiked = post.likes.includes(authUser._id);
-	const isMyPost = authUser._id === post.user._id;
-	const formattedDate = formatPostDate(post.createdAt);
 
+	const isMyPost = authUser._id === post.user._id;
+
+	const formattedDate = formatPostDate(post.createdAt);
+	
 	const { mutate: deletePost, isPending: isDeleting } = useMutation({
 		mutationFn: async () => {
 			try {
-				const res = await fetch(`/api/posts/${post._id}`, {
+				const res = await fetch(`/api/admin/deletePostAdmin/${post._id}`, {
 					method: "DELETE",
 				});
 				const data = await res.json();
@@ -112,85 +105,11 @@ const Post = ({ post }) => {
 			});
 			setComment("");
 			document.getElementById(`comments_modal${post._id}`).close();
-			queryClient.invalidateQueries({ queryKey: ["posts"] });
-
 		},
 		onError: (error) => {
 			toast.error(error.message);
 		},
 	});
-
-	const { mutate: editComment, isPending: isEditingComment } = useMutation({
-		mutationFn: async ({ commentId, text, img }) => {
-			try {
-				const res = await fetch(`/api/posts/${post._id}/comments/${commentId}`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ text, img }),
-				});
-				const data = await res.json();
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-				return data;
-			} catch (error) {
-				throw new Error(error.message);
-			}
-		},
-		onSuccess: (updatedComments) => {
-			queryClient.setQueryData(["posts"], (oldData) => {
-				return oldData.map((p) => {
-					if (p._id === post._id) {
-						return { ...p, comments: updatedComments };
-					}
-					return p;
-				});
-			});
-			toast.success("Comment updated successfully!");
-			setIsEditing(false); // Close modal
-			setEditingComment(null); // Clear editing state
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
-	});
-
-	const { mutate: deleteComment, isPending: isDeletingComment } = useMutation({
-		mutationFn: async (commentId) => {
-			try {
-				const res = await fetch(`/api/posts/${post._id}/deleteComments/${commentId}`, {
-					method: "DELETE",
-				});
-				const data = await res.json();
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-				return data;
-			} catch (error) {
-				throw new Error(error.message);
-			}
-		},
-		onSuccess: (updatedComments) => {
-			// Update the comments list without reloading the page
-			queryClient.setQueryData(["posts"], (oldData) => {
-				return oldData.map((p) => {
-					if (p._id === post._id) {
-						return { ...p, comments: updatedComments };
-					}
-					return p;
-				});
-			});
-			toast.success("Comment deleted successfully");
-			setComment("");
-			queryClient.invalidateQueries({ queryKey: ["posts"] });
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
-	});
-
 
 	const handleDeletePost = () => {
 		deletePost();
@@ -205,33 +124,7 @@ const Post = ({ post }) => {
 	const handleLikePost = () => {
 		if (isLiking) return;
 		likePost();
-	};
-
-	useEffect(() => {
-		if (isEditing) {
-			const modal = document.getElementById("edit_comment_modal");
-			if (modal) {
-				modal.showModal(); // Explicitly show the modal
-			}
-		}
-	}, [isEditing]);
-
-	const handleEditComment = (commentId, text) => {
-		setEditingComment(commentId);
-		setEditText(text);
-		setIsEditing(true); // Opens the Edit Comment Modal
-	};
-
-
-	// Function to handle form submission for editing a comment
-	const handleSubmitEdit = (e) => {
-		e.preventDefault();
-		if (isEditingComment) return;
-
-		editComment({ commentId: editingComment, text: editText, img: editImg });
-	};
-
-	console.log("is editing:", isEditing);
+	 };
 
 	return (
 		<>
@@ -251,14 +144,14 @@ const Post = ({ post }) => {
 							<span> · </span>
 							<span>{formattedDate}</span>
 						</span>
-						{isMyPost && (
+						{/* {isMyPost && ( */}
 							<span className='flex justify-end flex-1'>
 								{!isDeleting && (
 									<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
 								)}
 								{isDeleting && <LoadingSpinner size='sm' />}
 							</span>
-						)}
+						{/* )} */}
 					</div>
 					<div className='flex flex-col gap-3 overflow-hidden'>
 						<span>{post.text}</span>
@@ -285,7 +178,7 @@ const Post = ({ post }) => {
 					<div className='flex justify-between mt-3'>
 						{/* Left Section with Like Icon */}
 						<div className='flex items-center gap-4'>
-							<div className='flex gap-1 items-center cursor-pointer group' onClick={handleLikePost}>
+							{/* <div className='flex gap-1 items-center cursor-pointer group' onClick={handleLikePost}>
 								{isLiking && <LoadingSpinner size='sm' />}
 
 								{!isLiked && !isLiking && (
@@ -294,21 +187,22 @@ const Post = ({ post }) => {
 
 								{isLiked && !isLiking && (
 									<AiFillLike className='w-4 h-4 cursor-pointer text-pink-500' />
-								)}
+								)} */}
 
 								{/* Display like count with appropriate styles */}
-								<span
-									className={`text-sm group-hover:text-pink-500 ${isLiked ? "text-pink-500" : "text-slate-500"
+								{/* <span
+									className={`text-sm group-hover:text-pink-500 ${
+										isLiked ? "text-pink-500" : "text-slate-500"
 										}`}
 								>
 									{post.likes.length}
-								</span>
-							</div>
+								</span> */}
+							{/* </div> */}
 						</div>
 
 						{/* Center Section with Comment Icon */}
 						<div className='flex items-center gap-4'>
-							<div
+							{/* <div
 								className='flex gap-1 items-center cursor-pointer group'
 								onClick={() => document.getElementById("comments_modal" + post._id).showModal()}
 							>
@@ -316,17 +210,17 @@ const Post = ({ post }) => {
 								<span className='text-sm text-slate-500 group-hover:text-sky-400'>
 									{post.comments.length}
 								</span>
-							</div>
+							</div> */}
 						</div>
 
 						{/* Optional Right Section for Additional Icons */}
-						<div className='flex items-center gap-4'>
+						{/* <div className='flex items-center gap-4'> */}
 							{/* Any additional icons can go here */}
-							<div className='flex gap-1 items-center group cursor-pointer'>
+							{/* <div className='flex gap-1 items-center group cursor-pointer'>
 								<FaRegShareFromSquare className='w-6 h-6  text-slate-500 group-hover:text-green-500' />
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
-							</div>
-						</div>
+							</div> */}
+						{/* </div> */}
 
 						{/* Comments Modal */}
 						<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
@@ -345,25 +239,12 @@ const Post = ({ post }) => {
 													<img src={comment.user.profileImg || "/avatar-placeholder.png"} />
 												</div>
 											</div>
-											<div className='flex flex-col flex-1 relative'>
+											<div className='flex flex-col'>
 												<div className='flex items-center gap-1'>
 													<span className='font-bold'>{comment.user.fullName}</span>
 													<span className='text-gray-700 text-sm'>@{comment.user.username}</span>
 												</div>
 												<div className='text-sm'>{comment.text}</div>
-												{comment.user._id === authUser._id && (
-													<div className="flex justify-end gap-2 absolute top-0 right-0">
-														<FaEdit
-															className="w-4 h-4 text-slate-500 cursor-pointer hover:text-yellow-500"
-															onClick={() => handleEditComment(comment._id, comment.text)}
-														/>
-														<FaTrash
-															className="w-4 h-4 text-slate-500 cursor-pointer hover:text-red-500"
-															onClick={() => deleteComment(comment._id)}
-														/>
-													</div>
-												)}
-
 											</div>
 										</div>
 									))}
@@ -391,48 +272,6 @@ const Post = ({ post }) => {
 					</div>
 				</div>
 			</div >
-			{/* Edit Comment Modal */}
-			{isEditing && (
-				<dialog id="edit_comment_modal" className="modal border-none outline-none">
-					<div className="modal-box rounded border border-gray-600">
-						<h3 className="font-bold text-lg mb-4">Edit Comment</h3>
-						<form className="flex flex-col gap-4" onSubmit={handleSubmitEdit}>
-							<textarea
-								className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none border-gray-800"
-								placeholder="Update your comment..."
-								value={editText}
-								onChange={(e) => setEditText(e.target.value)}
-							/>
-							<div className="flex justify-end gap-2">
-								<button
-									type="button"
-									className="btn btn-secondary rounded-full btn-sm text-white px-4"
-									onClick={() => {
-										setIsEditing(false);
-										setEditText("");
-										setEditingComment(null);
-									}}
-								>
-									Cancel
-								</button>
-								<button
-									type="submit"
-									className="btn btn-primary rounded-full btn-sm text-white px-4"
-								>
-									{isEditingComment ? (
-										<span className="loading loading-spinner loading-md"></span>
-									) : (
-										"Save"
-									)}
-								</button>
-							</div>
-						</form>
-					</div>
-					<form method="dialog" className="modal-backdrop">
-						<button className="outline-none">close</button>
-					</form>
-				</dialog>
-			)}
 		</>
 	);
 };

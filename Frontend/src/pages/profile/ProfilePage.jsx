@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
@@ -19,6 +20,8 @@ import useFollow from "../../hooks/useFollow";
 import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
 
 const ProfilePage = () => {
+	const queryClient = useQueryClient();
+
 	const [coverImg, setCoverImg] = useState(null);
 	const [profileImg, setProfileImg] = useState(null);
 	const [feedType, setFeedType] = useState("posts");
@@ -68,6 +71,17 @@ const ProfilePage = () => {
 	useEffect(() => {
 		refetch();
 	}, [username, refetch]);
+
+	const handleFollowToggle = async () => {
+		// Call follow/unfollow mutation and update user profile after the action
+		await follow(user?._id);
+
+		// Refetch profile to update follower count and following state
+		refetch();
+
+		// Update `authUser` state and the button state in React Query cache
+		queryClient.invalidateQueries(["authUser"]);
+	};
 
 	return (
 		<>
@@ -140,7 +154,8 @@ const ProfilePage = () => {
 								{!isMyProfile && (
 									<button
 										className='btn btn-outline rounded-full btn-sm'
-										onClick={() => follow(user?._id)}
+										// onClick={() => follow(user?._id)}
+										onClick={handleFollowToggle}
 									>
 										{isPending && "Loading..."}
 										{!isPending && amIFollowing && "Unfollow"}

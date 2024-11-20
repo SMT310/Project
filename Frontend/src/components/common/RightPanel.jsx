@@ -25,7 +25,7 @@ const RightPanel = () => {
 		queryKey: ["allUsers"],
 		queryFn: async () => {
 			try {
-				const res = await fetch("/api/users/all", {
+				const res = await fetch("/api/users/getAllUser", {
 					method: "POST"
 				});
 				const data = await res.json();

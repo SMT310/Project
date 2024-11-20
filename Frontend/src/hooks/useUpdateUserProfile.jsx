@@ -23,12 +23,28 @@ const useUpdateUserProfile = () => {
 				throw new Error(error.message);
 			}
 		},
-		onSuccess: () => {
-			toast.success("Profile updated successfully");
+		// onSuccess: () => {
+		// 	toast.success("Profile updated successfully");
+		// 	Promise.all([
+		// 		queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+		// 		queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+		// 	]);
+		// },
+		onSuccess: (updatedUser) => {
+			// Update the authUser cache with the new data
+			queryClient.setQueryData(["authUser"], updatedUser);
+
+			// Optionally, you could also update localStorage here:
+			localStorage.setItem("authUser", JSON.stringify(updatedUser));
+
+
+			// Invalidate related queries to refetch any dependent data
 			Promise.all([
-				queryClient.invalidateQueries({ queryKey: ["authUser"] }),
 				queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+				queryClient.invalidateQueries({ queryKey: ["authUser"] }),
 			]);
+
+			toast.success("Profile updated successfully");
 		},
 		onError: (error) => {
 			toast.error(error.message);

@@ -49,6 +49,7 @@ const Posts = ({ feedType, username, userId }) => {
 					<PostSkeleton />
 					<PostSkeleton />
 					<PostSkeleton />
+					<PostSkeleton />
 				</div>
 			)}
 			{!isLoading && !isRefetching && posts?.length === 0 && (

@@ -282,3 +282,97 @@ export const getUserPosts = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//Edit comment
+export const editComment = async (req, res) => {
+    try {
+        const { text, img } = req.body; // New text or image for the comment
+        const postId = req.params.postId; // Post ID
+        const commentId = req.params.commentId; // Comment ID
+        const userId = req.user._id.toString(); // Authenticated user's ID
+
+        if (!text && !img) {
+            return res.status(400).json({ error: "Comment must have either text or an image" });
+        }
+
+        // Find the post by its ID
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        // Find the specific comment by ID
+        const comment = post.comments.id(commentId);
+        if (!comment) {
+            return res.status(404).json({ error: "Comment not found" });
+        }
+
+        // Ensure the user is authorized to edit the comment
+        if (comment.user.toString() !== userId) {
+            return res.status(403).json({ error: "You are not authorized to edit this comment" });
+        }
+
+        // Update the text or image
+        comment.text = text || comment.text; // Update the text if provided
+        if (img) {
+            // Handle image upload if a new image is provided
+            const uploadResponse = await cloudinary.uploader.upload(img, {
+                resource_type: 'auto',
+            });
+            comment.img = uploadResponse.secure_url; // Update the image URL
+        }
+
+        // Save the updated post document
+        await post.save();
+
+        // Respond with the updated comments array
+        res.status(200).json(post.comments);
+    } catch (error) {
+        console.error("Error in editComment controller:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const deleteComment = async (req, res) => {
+    const { postId, commentId } = req.params;
+
+    try {
+        // const post = await Post.findById(postId);
+        // if (!post) return res.status(404).json({ error: "Post not found" });
+
+        // // Ensure the comment belongs to the authenticated user
+        // const commentIndex = post.comments.findIndex(
+        //     (c) => c._id.toString() === commentId && c.user.toString() === req.user._id
+        // );
+
+        // if (commentIndex === -1) {
+        //     return res.status(403).json({ error: "Unauthorized" });
+        // }
+
+        // // Remove the comment
+        // post.comments.splice(commentIndex, 1);
+        // await post.save();
+
+        // res.json(post.comments);
+        // Find the post by postId
+        const post = await Post.findById(postId);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        // Ensure the comment belongs to the authenticated user
+        const comment = post.comments.find(c => c._id.toString() === commentId);
+        if (!comment) return res.status(404).json({ error: "Comment not found" });
+
+        // Check if the authenticated user is the owner of the comment
+        if (comment.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        // Remove the comment from the post
+        post.comments = post.comments.filter(c => c._id.toString() !== commentId);
+        await post.save();
+
+        res.json({ message: "Comment deleted successfully", comments: post.comments });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}

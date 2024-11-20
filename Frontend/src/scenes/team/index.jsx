@@ -1,19 +1,71 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../utils/db/theme";
-import { mockDataTeam } from "../../utils/db/mockData";
+
+import { FaTrash } from "react-icons/fa";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Header from "../../components/Header";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const queryClient = useQueryClient();
+  
+  const { data: allUserAdmin, isLoading, error } = useQuery({
+    queryKey: ["allUserAdmin"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/admin/getAllUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong!");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    },
+  });
+
+  const { mutate: deleteUser, isPending: isDeleting } = useMutation({
+    mutationFn: async (authUser) => {
+      try {
+        const res = await fetch(`/api/admin/${authUser}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    onSuccess: () => {
+      toast.success("User deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["allUserAdmin"] });
+    },
+  });
+
+  const handleDelete = (row) => {
+    deleteUser(row.id);
+  };
+
   const columns = [
     {
-      field: "name",
-      headerName: "Name",
+      field: "fullName",
+      headerName: "Full Name",
       flex: 1,
       cellClassName: "name-column--cell",
     },
@@ -28,10 +80,10 @@ const Team = () => {
       flex: 1,
     },
     {
-      field: "accessLevel",
+      field: "role",
       headerName: "Access Level",
       flex: 1,
-      renderCell: ({ row: { access } }) => {
+      renderCell: ({ row: { role } }) => {
         return (
           <Box
             width="60%"
@@ -42,25 +94,52 @@ const Team = () => {
             justifyContent="center"
             alignItems="center"
             backgroundColor={
-              access === "admin"
+              role === "admin"
                 ? colors.greenAccent[700]
-                : access === "manager"
-                ? colors.greenAccent[700]
-                : colors.greenAccent[700]
+                : role === "manager"
+                  ? colors.greenAccent[700]
+                  : colors.greenAccent[700]
             }
             borderRadius="10px"
           >
-            {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
-            {access === "manager" && <SecurityOutlinedIcon />}
-            {access === "user" && <LockOpenOutlinedIcon />}
+            {role === "admin" && <AdminPanelSettingsOutlinedIcon />}
+            {role === "manager" && <SecurityOutlinedIcon />}
+            {role === "user" && <LockOpenOutlinedIcon />}
             <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-              {access}
+              {role}
             </Typography>
           </Box>
         );
       },
     },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 0.5,
+      renderCell: (params) => (
+        <Box
+          width="60%"
+          display="flex"
+          m="0 auto"
+          mt="10px"
+          p="5px"
+          justifyContent="center"
+          alignItems="center"
+        >
+          {!isDeleting && (
+            <FaTrash
+              style={{ cursor: "pointer", color: theme.palette.text.primary }}
+              onClick={() => handleDelete(params)}
+            />
+          )}
+          {isDeleting && <LoadingSpinner size='sm' />}
+        </Box>
+      ),
+    }
   ];
+
+  if (isLoading) return <LoadingSpinner size='lg' />;
+  if (error) return <Typography color="error">{error.message}</Typography>;
 
   return (
     <Box m="20px">
@@ -94,7 +173,12 @@ const Team = () => {
           },
         }}
       >
-        <DataGrid checkboxSelection rows={mockDataTeam} columns={columns} />
+        <DataGrid
+          // checkboxSelection
+          rows={allUserAdmin || []}
+          columns={columns}
+          getRowId={(row) => row._id}
+        />
       </Box>
     </Box>
   );

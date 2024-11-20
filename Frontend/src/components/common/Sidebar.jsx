@@ -1,16 +1,24 @@
 import XSvg from "../svgs/X";
 
+import { useNavigate } from "react-router-dom";
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
+import { useState } from "react";
 // import { FaUser } from "react-icons/fa";
 import { RiMapPinUserFill } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
+import { BiPencil } from "react-icons/bi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+import CreatePostModal from "./CreatePostModal";
+import CreatePost from "../../pages/home/CreatePost";
 const Sidebar = () => {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+	
 	const { mutate: logout } = useMutation({
 		mutationFn: async () => {
 			try {
@@ -28,7 +36,9 @@ const Sidebar = () => {
 		},
 		onSuccess: () => {
 			toast.success("Logout successfully");
+			localStorage.removeItem("authUser");
 			queryClient.invalidateQueries({ queryKey: ["authUser"] });
+			navigate("/login");
 		},
 		onError: () => {
 			toast.error("Logout failed");
@@ -71,6 +81,20 @@ const Sidebar = () => {
 							<RiMapPinUserFill className='w-6 h-6' />
 							<span className='text-lg hidden md:block'>Profile</span>
 						</Link>
+					</li>
+
+					<li className="flex justify-center md:justify-start">
+						<button
+							className="flex items-center gap-3 py-2 px-3 bg-red-500 text-white rounded-full hover:bg-opacity-80 transition-all duration-300"
+							onClick={() => setIsModalOpen(true)}
+						>
+							{/* Create Post */}
+							<span className="text-lg">Create Post</span>
+							<BiPencil className="w-6 h-6" />
+						</button>
+						<CreatePostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+							<CreatePost onSuccess={() => setIsModalOpen(false)} />
+						</CreatePostModal>
 					</li>
 				</ul>
 				{authUser && (

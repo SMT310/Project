@@ -15,12 +15,18 @@ const useFollow = () => {
 				if (!res.ok) {
 					throw new Error(data.error || "Something went wrong!");
 				}
+
+				const updatedUser = data.updatedUser;
+				localStorage.setItem("authUser", JSON.stringify(updatedUser));
+				queryClient.setQueryData(["authUser"], updatedUser);
+
+				console.log(data);
 				return;
 			} catch (error) {
 				throw new Error(error.message);
 			}
 		},
-		onSuccess: () => {
+		onSuccess: (updatedAuthUser) => {
 			Promise.all([
 				queryClient.invalidateQueries({ queryKey: ["suggestedUsers"] }),
 				queryClient.invalidateQueries({ queryKey: ["authUser"] }),

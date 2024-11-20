@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../utils/db/theme";
 
@@ -33,8 +34,19 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Team");
+  const location = useLocation();
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-  console.log("authUser is:", authUser);
+  console.log("authUser when click Team is:", authUser);
+
+  useEffect(() => {
+    const pathToTitle = {
+      "/team": "User Management",
+      "/form": "Create account",
+      "/posts": "Posts Management"
+    };
+    setSelected(pathToTitle[location.pathname] || "");
+  }, [location.pathname]);
+
   return (
     <Box
       sx={{
@@ -122,6 +134,13 @@ const Sidebar = () => {
               title="Create account"
               to="/form"
               icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Posts Management"
+              to="/posts"
+              icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
