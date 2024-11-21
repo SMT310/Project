@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -13,7 +14,8 @@ import adminRoute from "./routes/admin.routes.js";
 import connectMongoDB from "./db/connectMongoDB.js";
 
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
+const __dirname = path.resolve();
 
 dotenv.config();
 cloudinary.config({
@@ -32,9 +34,14 @@ app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use('/api/admin', adminRoute);
 
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "/Frontend/dist")));
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "Frontend", "dist", "index.html"));
+    })
+}
 
-
-app.listen(port, () => {
-    console.log(`Server is running on: http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on: http://localhost:${PORT}`);
     connectMongoDB();
 });

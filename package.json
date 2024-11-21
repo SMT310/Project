@@ -1,9 +1,12 @@
 {
+  "name": "POSE",
+  "version": "1.0.0",
   "type": "module",
   "main": "Backend/server.js",
   "scripts": {
-    "dev": "nodemon Backend/server.js",
-    "start": "node Backend/server.js"
+    "dev": "NODE_ENV=development Backend/server.js",
+    "start": "NODE_ENV=production node Backend/server.js",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "dependencies": {
     "axios": "^1.7.7",
