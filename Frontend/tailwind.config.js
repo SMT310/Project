@@ -14,8 +14,8 @@ export default {
   ],
   daisyui: {
     themes: [
-      "luxury",
       "light",
+      "luxury",
       "dracula",
       {
         black: {
