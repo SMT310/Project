@@ -63,8 +63,8 @@ const NotificationPage = () => {
 			<div className='flex max-w-6xl mx-auto p-0'>
 				<Sidebar />
 			</div>
-			<div className='flex-[4_4_0] border-l border-r border-gray-700 min-h-screen'>
-				<div className='flex justify-between items-center p-4 border-b border-gray-700'>
+			<div className='flex-[4_4_0] border-l border-r border-zinc-300 min-h-screen'>
+				<div className='flex justify-between items-center p-4 border-b border-gray-400'>
 					<p className='font-bold'>Notifications</p>
 					<div className='dropdown dropdown-bottom dropdown-end'>
 						<div tabIndex={0} role='button' className='m-1'>
@@ -86,8 +86,8 @@ const NotificationPage = () => {
 					</div>
 				)}
 				{filteredNotifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
-				{filteredNotifications?.map((notification) => (
-					<div className='border-b border-gray-700' key={notification._id}>
+				{/* {filteredNotifications?.map((notification) => (
+					<div className='border-b border-gray-300' key={notification._id}>
 						<div className='flex gap-2 p-4'>
 							<div className='flex-shrink-0'>
 								{notification.type === "follow" && <FaUser className='w-7 h-7 text-primary' />}
@@ -115,7 +115,56 @@ const NotificationPage = () => {
 							</Link>
 						</div>
 					</div>
+				))} */}
+				{filteredNotifications?.map((notification) => (
+					<div className="border-b border-gray-300" key={notification._id}>
+						<div className="flex justify-between p-4">
+							{/* Left Section: Notification Content */}
+							<div className="flex gap-2 items-center">
+								{/* Icon Section */}
+								<div className="flex-shrink-0">
+									{notification.type === "follow" && <FaUser className="w-7 h-7 text-primary" />}
+									{notification.type === "like" && <AiFillLike className="w-7 h-7 text-red-500" />}
+									{notification.type === "comment" && <BiSolidComment className="w-7 h-7 text-blue-500" />}
+								</div>
+
+								{/* Notification Message */}
+								<Link to={`/profile/${notification.from.username}`} className="flex items-center gap-2">
+									<div className="avatar">
+										<div className="w-8 rounded-full">
+											<img src={notification.from.profileImg || "/avatar-placeholder.png"} alt="User Avatar" />
+										</div>
+									</div>
+									<div className="flex gap-1">
+										<span className="font-bold">@{notification.from.username}</span>{" "}
+										{notification.type === "follow" ? (
+											"followed you"
+										) : notification.type === "like" ? (
+											"liked your post"
+										) : notification.type === "comment" ? (
+											"commented on your post"
+										) : (
+											""
+										)}
+									</div>
+								</Link>
+							</div>
+
+							{/* Right Section: Notification Time */}
+							<div className="text-sm text-gray-500 flex-shrink-0">
+								{notification.createdAt
+									? new Date(notification.createdAt).toLocaleString("en-US", {
+										hour: "2-digit",
+										minute: "2-digit",
+										month: "short",
+										day: "numeric",
+									})
+									: "Just now"}
+							</div>
+						</div>
+					</div>
 				))}
+
 			</div>
 			<div className='flex max-w-6xl mx-auto p-0'>
 				<RightPanel />
