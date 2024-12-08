@@ -88,7 +88,7 @@ const ProfilePage = () => {
 			<div className='flex max-w-6xl mx-auto p-0'>
 				<Sidebar />
 			</div>
-			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
+			<div className='flex-[4_4_0]  border-r border-gray-300 min-h-screen '>
 				{/* HEADER */}
 				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
 				{!isLoading && !isRefetching && !user && <p className='text-center text-lg mt-4'>User not found</p>}
@@ -136,7 +136,7 @@ const ProfilePage = () => {
 								/>
 								{/* USER AVATAR */}
 								<div className='avatar absolute -bottom-16 left-4'>
-									<div className='w-32 rounded-full relative group/avatar'>
+									<div className='w-32 rounded-full ring-2 ring-gray-300 dark:ring-gray-500 relative group/avatar'>
 										<img src={profileImg || user?.profileImg || "/avatar-placeholder.png"} />
 										<div className='absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer'>
 											{isMyProfile && (
@@ -208,31 +208,31 @@ const ProfilePage = () => {
 								<div className='flex gap-2'>
 									<div className='flex gap-1 items-center'>
 										<span className='font-bold text-xs'>{user?.following.length}</span>
-										<span className='text-slate-500 text-xs'>Following</span>
+										<span className='text-slate-500 text-sm'>Following</span>
 									</div>
 									<div className='flex gap-1 items-center'>
 										<span className='font-bold text-xs'>{user?.followers.length}</span>
-										<span className='text-slate-500 text-xs'>Followers</span>
+										<span className='text-slate-500 text-sm'>Followers</span>
 									</div>
 								</div>
 							</div>
 							<div className='flex w-full border-b border-gray-700 mt-4'>
 								<div
-									className='flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer'
+									className='flex justify-center flex-1 p-3 hover:bg-gray-300 transition duration-300 relative cursor-pointer'
 									onClick={() => setFeedType("posts")}
 								>
 									Posts
 									{feedType === "posts" && (
-										<div className='absolute bottom-0 w-10 h-1 rounded-full bg-primary' />
+										<div className='absolute bottom-0 w-10 h-1 rounded-full bg-blue-500' />
 									)}
 								</div>
 								<div
-									className='flex justify-center flex-1 p-3 text-slate-500 hover:bg-secondary transition duration-300 relative cursor-pointer'
+									className='flex justify-center flex-1 p-3 text-slate-500 hover:bg-gray-300 transition duration-300 relative cursor-pointer'
 									onClick={() => setFeedType("likes")}
 								>
 									Likes
 									{feedType === "likes" && (
-										<div className='absolute bottom-0 w-10  h-1 rounded-full bg-primary' />
+										<div className='absolute bottom-0 w-10  h-1 rounded-full bg-blue-500' />
 									)}
 								</div>
 							</div>
