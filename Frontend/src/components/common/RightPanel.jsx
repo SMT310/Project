@@ -53,9 +53,11 @@ const RightPanel = () => {
 
 	return (
 		<div className="hidden lg:block my-4 mx-2">
-			<div className="sticky top-2 z-20 p-4 rounded-md mb-4">
+			{/* <div className="sticky top-2 z-20 p-4 rounded-md mb-4"> */}
+			<div className="top-2 z-20 p-4 rounded-md mb-4">
 				{/* Search Bar */}
-				<div className="relative">
+				{/* <div className="relative"> */}
+				<div className="">
 					<label className="input input-bordered flex items-center gap-2 w-full rounded-full bg-white shadow-lg px-4">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -94,7 +96,7 @@ const RightPanel = () => {
 										key={user._id}
 									>
 										<div className="avatar">
-											<div className="w-8 h-8 rounded-full">
+											<div className="w-10 h-10 rounded-full overflow-hidden">
 												<img
 													src={user.profileImg || "/avatar-placeholder.png"}
 													alt={user.fullName}
@@ -118,7 +120,8 @@ const RightPanel = () => {
 			</div>
 
 			{/* "Who to follow" Section */}
-			<div className="bg-[white] p-4 rounded-md sticky top-20 shadow-lg">
+			{/* <div className="bg-[white] p-4 rounded-md sticky top-20 shadow-lg"> */}
+			<div className="bg-[white] p-4 rounded-md  top-20 shadow-lg">
 				<p className="font-bold text-black text-left mb-4">Who to follow</p>
 				<div className="flex flex-col gap-4">
 					{isLoading && (
@@ -137,11 +140,11 @@ const RightPanel = () => {
 								key={user._id}
 							>
 								<div className="flex gap-2 items-center">
-									<div className="avatar">
-										<div className="w-8 rounded-full">
+									{/* <div className="avatar"> */}
+										<div className="w-8 h-8 rounded-full overflow-hidden">
 											<img src={user.profileImg || "/avatar-placeholder.png"} />
 										</div>
-									</div>
+									{/* </div> */}
 									<div className="flex flex-col leading-tight">
 										<span className="font-semibold tracking-tight truncate w-28">
 											{user.fullName}

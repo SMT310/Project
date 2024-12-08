@@ -18,7 +18,7 @@ const Sidebar = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
-	
+
 	const { mutate: logout } = useMutation({
 		mutationFn: async () => {
 			try {

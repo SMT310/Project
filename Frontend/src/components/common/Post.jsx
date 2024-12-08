@@ -235,15 +235,25 @@ const Post = ({ post }) => {
 
 	return (
 		<>
-			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
-				<div className='avatar'>
-					<Link to={`/profile/${postOwner.username}`} className='w-8 rounded-full overflow-hidden '>
+			<div className='flex gap-2 items-start p-4 border-b border-gray-300'>
+				{/* <div className='Rounded avatar'>
+					<Link to={`/profile/${postOwner.username}`} className='w-10 h-10 rounded-full overflow-hidden '>
 						<img src={postOwner.profileImg || "/avatar-placeholder.png"} />
+					</Link>
+				</div> */}
+				{/* Avatar Section */}
+				<div className="w-10 h-10 rounded-full overflow-hidden">
+					<Link to={`/profile/${postOwner.username}`}>
+						<img
+							src={postOwner.profileImg || "/avatar-placeholder.png"}
+							className="w-full h-full object-cover rounded-full"
+							alt="User Avatar"
+						/>
 					</Link>
 				</div>
 				<div className='flex flex-col flex-1'>
-					<div className='flex gap-2 items-center'>
-						<Link to={`/profile/${postOwner.username}`} className='font-bold'>
+					{/* <div className='flex gap-2 items-center'>
+						<Link to={`/profile/${postOwner.username}`} className='font-bold text-lg'>
 							{postOwner.fullName}
 						</Link>
 						<span className='text-slate-400 hover:text-sky-400 flex gap-1 text-sm'>
@@ -259,9 +269,36 @@ const Post = ({ post }) => {
 								{isDeleting && <LoadingSpinner size='sm' />}
 							</span>
 						)}
+					</div> */}
+					<div className="flex gap-2 items-center">
+						<Link to={`/profile/${postOwner.username}`} className="font-bold text-lg">
+							{postOwner.fullName}
+						</Link>
+						<div className="flex gap-1 text-sm text-slate-400">
+							<Link
+								to={`/profile/${postOwner.username}`}
+								className="hover:text-sky-400"
+							>
+								@{postOwner.username}
+							</Link>
+							<span> · </span>
+							<span className="hover:text-sky-300">{formattedDate}</span>
+						</div>
+						{isMyPost && (
+							<span className="flex justify-end flex-1">
+								{!isDeleting && (
+									<FaTrash
+										className="cursor-pointer hover:text-red-500"
+										onClick={handleDeletePost}
+									/>
+								)}
+								{isDeleting && <LoadingSpinner size="sm" />}
+							</span>
+						)}
 					</div>
+
 					<div className='flex flex-col gap-3 overflow-hidden'>
-						<span>{post.text}</span>
+						<span className="text-lg">{post.text}</span>
 						{/* {post.img && (
 							<img
 								src={post.img}
@@ -375,7 +412,7 @@ const Post = ({ post }) => {
 										value={comment}
 										onChange={(e) => setComment(e.target.value)}
 									/>
-									<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
+									<button className='btn bg-black hover:bg-[#1991DA] rounded-full btn-sm text-white px-4'>
 										{isCommenting ? (
 											<span className='loading loading-spinner loading-md'></span>
 										) : (

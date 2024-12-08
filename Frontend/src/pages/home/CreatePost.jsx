@@ -78,9 +78,13 @@ const CreatePost = () => {
 					<img src={authUser.profileImg || "/avatar-placeholder.png"} />
 				</div>
 			</div> */}
-			<div className="avatar flex-shrink-0">
-				<div className="w-12 h-12 rounded-full">
-					<img src={authUser.profileImg || "/avatar-placeholder.png"} />
+			<div className="flex-shrink-0">
+				<div className="w-12 h-12 rounded-full overflow-hidden">
+					<img
+						src={authUser.profileImg || "/avatar-placeholder.png"}
+						alt="User Avatar"
+						className="w-full h-full object-cover"
+					/>
 				</div>
 			</div>
 			<form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
@@ -109,7 +113,7 @@ const CreatePost = () => {
 				<div className='flex justify-between border-t py-2'>
 					<div className='flex gap-1 items-center'>
 						<CiImageOn
-							className='fill-primary w-6 h-6 cursor-pointer hover:bg-gray-300'
+							className='fill-[#1DA1F2] w-8 h-8 cursor-pointer hover:bg-gray-300 hover:rounded-full p-1'
 							onClick={() => imgRef.current.click()}
 						/>
 						{/* <BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' /> */}
