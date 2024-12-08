@@ -130,8 +130,8 @@ const NotificationPage = () => {
 
 								{/* Notification Message */}
 								<Link to={`/profile/${notification.from.username}`} className="flex items-center gap-2">
-									<div className="avatar">
-										<div className="w-8 rounded-full">
+									<div className="">
+										<div className="w-8 h-8 rounded-full overflow-hidden">
 											<img src={notification.from.profileImg || "/avatar-placeholder.png"} alt="User Avatar" />
 										</div>
 									</div>
