@@ -70,11 +70,16 @@ const CreatePost = () => {
 	if (!authUser) {
 		return <div>Loading...</div>; // Or any other loading state for authUser
 	}
-	
+
 	return (
-		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
-			<div className='avatar'>
+		<div className='flex p-4 items-start gap-4 border-b border-slate-300'>
+			{/* <div className='avatar'>
 				<div className='w-8 rounded-full'>
+					<img src={authUser.profileImg || "/avatar-placeholder.png"} />
+				</div>
+			</div> */}
+			<div className="avatar flex-shrink-0">
+				<div className="w-12 h-12 rounded-full">
 					<img src={authUser.profileImg || "/avatar-placeholder.png"} />
 				</div>
 			</div>
@@ -101,13 +106,13 @@ const CreatePost = () => {
 					</div>
 				)}
 
-				<div className='flex justify-between border-t py-2 border-t-gray-700'>
+				<div className='flex justify-between border-t py-2'>
 					<div className='flex gap-1 items-center'>
 						<CiImageOn
-							className='fill-primary w-6 h-6 cursor-pointer'
+							className='fill-primary w-6 h-6 cursor-pointer hover:bg-gray-300'
 							onClick={() => imgRef.current.click()}
 						/>
-						<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
+						{/* <BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' /> */}
 					</div>
 					<input
 						type='file'
@@ -117,7 +122,7 @@ const CreatePost = () => {
 						accept="image/*"
 						multiple // Allow multiple file selection
 					/>
-					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
+					<button className='btn bg-black hover:bg-[#1991DA] rounded-full btn-sm text-white px-4 py-2'>
 						{isPending ? "Posting..." : "Post"}
 					</button>
 				</div>

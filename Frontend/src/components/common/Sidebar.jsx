@@ -50,7 +50,7 @@ const Sidebar = () => {
 	return (
 		<div className="md:flex-[2_2_0] w-18 max-w-64">
 			{/* Increased width here */}
-			<div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-32 md:w-64">
+			<div className="sticky top-0 left-0 h-screen flex flex-col border-r border-zinc-300 w-32 md:w-64">
 				<Link to="/" className="flex justify-center md:justify-start">
 					<XSvg className="px-1 w-16 h-16 rounded-full fill-[#1DA1F2] hover:bg-gray-300" />
 				</Link>
