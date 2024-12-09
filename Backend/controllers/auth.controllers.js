@@ -121,3 +121,46 @@ export const getMe = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+//Count user by month
+export const getUserCountForYear = async (req, res) => {
+    try {
+        const { year = new Date().getFullYear() } = req.body; // Default to the current year if not provided
+
+        // Aggregate the users grouped by month for the entire year
+        const userCount = await User.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: new Date(year, 0, 1), // Start of the year
+                        $lt: new Date(year + 1, 0, 1), // Start of the next year
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: "$createdAt" }, // Group by the month of the `createdAt` field
+                    totalUsers: { $sum: 1 } // Count users in each month
+                }
+            },
+            {
+                $sort: { _id: 1 } // Sort by month (ascending order)
+            }
+        ]);
+
+        // If no users found, return 0 for each month
+        const result = [];
+        for (let month = 1; month <= 12; month++) {
+            const monthData = userCount.find(item => item._id === month);
+            result.push({
+                month: month,
+                totalUsers: monthData ? monthData.totalUsers : 0
+            });
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error("Error getting user count for the year:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};

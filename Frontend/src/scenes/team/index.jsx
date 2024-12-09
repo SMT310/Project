@@ -14,7 +14,7 @@ const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const queryClient = useQueryClient();
-  
+
   const { data: allUserAdmin, isLoading, error } = useQuery({
     queryKey: ["allUserAdmin"],
     queryFn: async () => {
@@ -73,11 +73,15 @@ const Team = () => {
       field: "username",
       headerName: "Username",
       flex: 1,
+      cellClassName: "name-column--cell",
+
     },
     {
       field: "email",
       headerName: "Email",
       flex: 1,
+      cellClassName: "name-column--cell",
+
     },
     {
       field: "role",
@@ -128,7 +132,7 @@ const Team = () => {
         >
           {!isDeleting && (
             <FaTrash
-              style={{ cursor: "pointer", color: theme.palette.text.primary }}
+              style={{ cursor: "pointer", color: "#FFFFFF", }}
               onClick={() => handleDelete(params)}
             />
           )}
@@ -143,30 +147,43 @@ const Team = () => {
 
   return (
     <Box m="20px">
-      <Header title="USERS" subtitle="Managing Users" />
+      <Header title="USERS" subtitle="Manage Users" />
       <Box
         m="40px 0 0 0"
-        height="75vh"
+        height="70vh"
         sx={{
           "& .MuiDataGrid-root": {
-            border: "none",
+            border: `1px solid ${colors.grey[900]}`, // Border around the entire grid
           },
           "& .MuiDataGrid-cell": {
-            borderBottom: "none",
+            borderBottom: `1px solid ${colors.primary[400]}`, // Horizontal row borders
+            // borderRight: `1px solid ${colors.grey[900]}`, // Vertical column borders
+          },
+          "& .MuiDataGrid-cell:last-of-type": {
+            borderRight: "none", // Remove right border for the last column
           },
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            color: colors.grey[100],
+            fontWeight: "bold",
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
+            borderBottom: `2px solid ${colors.grey[700]}`, // Bottom border for headers
+            borderRight: `1px solid ${colors.grey[700]}`, // Vertical borders for headers
+          },
+          "& .MuiDataGrid-columnSeparator": {
+            color: "#000",
+          },
+          "& .MuiDataGrid-columnHeaders:last-of-type": {
+            borderRight: "none", // Remove right border for the last header column
           },
           "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
+            // backgroundColor: colors.primary[500], // Background for the data area
+            backgroundColor: "#1E90FF",
           },
           "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            borderTop: `1px solid ${colors.grey[100]}`, // Top border for footer
+            backgroundColor: colors.primary[400],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
@@ -174,12 +191,12 @@ const Team = () => {
         }}
       >
         <DataGrid
-          // checkboxSelection
           rows={allUserAdmin || []}
           columns={columns}
           getRowId={(row) => row._id}
         />
       </Box>
+
     </Box>
   );
 };

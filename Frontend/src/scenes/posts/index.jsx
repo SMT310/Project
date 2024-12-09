@@ -1,5 +1,6 @@
 import Post from "./Post";
 import PostSkeleton from "./PostSkeleton";
+import Header from "../../components/Header";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
@@ -44,6 +45,7 @@ const Posts = ({ feedType, username, userId }) => {
 
     return (
         <>
+            <Header title="POSTS" subtitle="Manage Posts" />
             {(isLoading || isRefetching) && (
                 <div className='flex flex-col justify-center'>
                     <PostSkeleton />

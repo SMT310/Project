@@ -150,7 +150,12 @@ const Form = () => {
           </Box>
         </Box>
         <Box display="flex" justifyContent="end" mt="20px">
-          <Button type="submit" color="secondary" variant="contained">
+          <Button type="submit" color="secondary" variant="contained" sx={{
+            backgroundColor: "#87CEFA", // Set the background color to #1E90FF
+            "&:hover": {
+              backgroundColor: "#FFF5EE", // Optional: Change the background color when hovered
+            },
+          }}>
             {isPending ? "Loading..." : "Create New Account"}
           </Button>
         </Box>

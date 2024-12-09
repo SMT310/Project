@@ -10,6 +10,8 @@ import { tokens } from "../../utils/db/theme";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
+import PagesOutlinedIcon from '@mui/icons-material/PagesOutlined';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -42,7 +44,8 @@ const Sidebar = () => {
     const pathToTitle = {
       "/team": "User Management",
       "/form": "Create account",
-      "/posts": "Posts Management"
+      "/posts": "Posts Management",
+      "/statistic": "Statistic"
     };
     setSelected(pathToTitle[location.pathname] || "");
   }, [location.pathname]);
@@ -51,7 +54,7 @@ const Sidebar = () => {
     <Box
       sx={{
         "& .pro-sidebar-inner": {
-          background: `${colors.primary[400]} !important`,
+          background: `${colors.grey[900]} !important`,
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
@@ -140,7 +143,14 @@ const Sidebar = () => {
             <Item
               title="Posts Management"
               to="/posts"
-              icon={<PeopleOutlinedIcon />}
+              icon={<PagesOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Statistic"
+              to="/statistic"
+              icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

@@ -58,15 +58,15 @@ const Topbar = () => {
 
       {/* ICONS */}
       <Box display="flex">
-        <IconButton onClick={colorMode.toggleColorMode}>
+        {/* <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
             <DarkModeOutlinedIcon />
           ) : (
             <LightModeOutlinedIcon />
           )}
-        </IconButton>
+        </IconButton> */}
         <IconButton>
-          <BiLogOut className='w-5 h-5 cursor-pointer'
+          <BiLogOut className='w-5 h-5 cursor-pointer' 
             onClick={(e) => {
               e.preventDefault();
               logout();

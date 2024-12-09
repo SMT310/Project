@@ -6,6 +6,7 @@ import Sidebar from "../../scenes/global/Sidebar";
 import Team from "../../scenes/team";
 import Form from "../../scenes/form";
 import Posts from "../../scenes/posts";
+import Dashboard from "../../scenes/dashboard";
 import '../../App.css'
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -21,15 +22,16 @@ const AdminPage = () => {
         //     <ThemeProvider theme={theme}>
         //         <CssBaseline />
         <>
-                <div className="app"></div>
-                <Sidebar isSidebar={isSidebar} />
-                <main className="content">
-                    <Topbar setIsSidebar={setIsSidebar} />
-                    <Routes>
-                        <Route path="/team" element={<Team />} />
-                        <Route path="/form" element={<Form />} />
-                        <Route path="/posts" element={<Posts />} />
-                    </Routes>
+            <div className="app"></div>
+            <Sidebar isSidebar={isSidebar} />
+            <main className="content">
+                <Topbar setIsSidebar={setIsSidebar} />
+                <Routes>
+                    <Route path="/team" element={<Team />} />
+                    <Route path="/form" element={<Form />} />
+                    <Route path="/posts" element={<Posts />} />
+                    <Route path="/statistic" element={<Dashboard />} />
+                </Routes>
             </main>
         </>
         //     </ThemeProvider>

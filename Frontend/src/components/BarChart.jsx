@@ -1,130 +1,131 @@
-import { useTheme } from "@mui/material";
-import { ResponsiveBar } from "@nivo/bar";
-import { tokens } from "../utils/db/theme";
-import { mockBarData as data } from "../utils/db/mockData";
+import * as React from 'react';
+import { useTheme } from '@mui/material';
+import { Stack, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem } from '@mui/material';
+import axios from 'axios';
+import { BarChart as XBarChart } from '@mui/x-charts/BarChart';
+import { axisClasses } from '@mui/x-charts/ChartsAxis';
 
-const BarChart = ({ isDashboard = false }) => {
+// Dummy value formatter (adjust as needed)
+const valueFormatter = (value) => Math.round(value);
+
+function TickParamsSelector({
+  tickPlacement,
+  tickLabelPlacement,
+  setTickPlacement,
+  setTickLabelPlacement,
+}) {
+  return (
+    <Stack direction="column" justifyContent="space-between" sx={{ width: '100%' }}>
+      {/* <FormControl>
+        <FormLabel id="tick-placement-radio-buttons-group-label">tickPlacement</FormLabel>
+        <RadioGroup
+          row
+          aria-labelledby="tick-placement-radio-buttons-group-label"
+          name="tick-placement"
+          value={tickPlacement}
+          onChange={(event) => setTickPlacement(event.target.value)}
+        >
+          <FormControlLabel value="start" control={<Radio />} label="start" />
+          <FormControlLabel value="end" control={<Radio />} label="end" />
+          <FormControlLabel value="middle" control={<Radio />} label="middle" />
+          <FormControlLabel value="extremities" control={<Radio />} label="extremities" />
+        </RadioGroup>
+      </FormControl> */}
+      {/* <FormControl>
+        <FormLabel id="label-placement-radio-buttons-group-label">tickLabelPlacement</FormLabel>
+        <RadioGroup
+          row
+          aria-labelledby="label-placement-radio-buttons-group-label"
+          name="label-placement"
+          value={tickLabelPlacement}
+          onChange={(event) => setTickLabelPlacement(event.target.value)}
+        >
+          <FormControlLabel value="tick" control={<Radio />} label="tick" />
+          <FormControlLabel value="middle" control={<Radio />} label="middle" />
+        </RadioGroup>
+      </FormControl> */}
+    </Stack>
+  );
+}
+
+export default function UserCountBarChart() {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const [tickPlacement, setTickPlacement] = React.useState('middle');
+  const [tickLabelPlacement, setTickLabelPlacement] = React.useState('middle');
+  const [data, setData] = React.useState([]);
+  const [year, setYear] = React.useState(new Date().getFullYear()); // Default to current year
+  const [availableYears, setAvailableYears] = React.useState([2023, 2024]); // Placeholder, replace with your years dynamically
+
+  React.useEffect(() => {
+    axios
+      .post("/api/auth/countUser", { year })  // Replace with your actual API endpoint
+      .then((response) => {
+        const monthlyUserData = response.data; // Assuming response is an array of objects with { month, totalUsers }
+
+        // Format the data for @mui/x-charts BarChart
+        const formattedData = monthlyUserData.map(item => ({
+          month: `Month ${item.month}`,  // Convert month to string format
+          users: item.totalUsers,        // The user count for the bar chart
+        }));
+
+        setData(formattedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching user count data:", error);
+      });
+  }, [year]);
+
+  const chartSetting = {
+    yAxis: [
+      {
+        label: 'User Count',
+      },
+    ],
+    series: [{ dataKey: 'users', label: 'Account Created', valueFormatter }],
+    height: 300,
+    sx: {
+      [`& .${axisClasses.directionY} .${axisClasses.label}`]: {
+        transform: 'translateX(-10px)',
+      },
+    },
+  };
 
   return (
-    <ResponsiveBar
-      data={data}
-      theme={{
-        // added
-        axis: {
-          domain: {
-            line: {
-              stroke: colors.grey[100],
-            },
-          },
-          legend: {
-            text: {
-              fill: colors.grey[100],
-            },
-          },
-          ticks: {
-            line: {
-              stroke: colors.grey[100],
-              strokeWidth: 1,
-            },
-            text: {
-              fill: colors.grey[100],
-            },
-          },
-        },
-        legends: {
-          text: {
-            fill: colors.grey[100],
-          },
-        },
-      }}
-      keys={["hot dog", "burger", "sandwich", "kebab", "fries", "donut"]}
-      indexBy="country"
-      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-      padding={0.3}
-      valueScale={{ type: "linear" }}
-      indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "nivo" }}
-      defs={[
-        {
-          id: "dots",
-          type: "patternDots",
-          background: "inherit",
-          color: "#38bcb2",
-          size: 4,
-          padding: 1,
-          stagger: true,
-        },
-        {
-          id: "lines",
-          type: "patternLines",
-          background: "inherit",
-          color: "#eed312",
-          rotation: -45,
-          lineWidth: 6,
-          spacing: 10,
-        },
-      ]}
-      borderColor={{
-        from: "color",
-        modifiers: [["darker", "1.6"]],
-      }}
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: isDashboard ? undefined : "country", // changed
-        legendPosition: "middle",
-        legendOffset: 32,
-      }}
-      axisLeft={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: isDashboard ? undefined : "food", // changed
-        legendPosition: "middle",
-        legendOffset: -40,
-      }}
-      enableLabel={false}
-      labelSkipWidth={12}
-      labelSkipHeight={12}
-      labelTextColor={{
-        from: "color",
-        modifiers: [["darker", 1.6]],
-      }}
-      legends={[
-        {
-          dataFrom: "keys",
-          anchor: "bottom-right",
-          direction: "column",
-          justify: false,
-          translateX: 120,
-          translateY: 0,
-          itemsSpacing: 2,
-          itemWidth: 100,
-          itemHeight: 20,
-          itemDirection: "left-to-right",
-          itemOpacity: 0.85,
-          symbolSize: 20,
-          effects: [
-            {
-              on: "hover",
-              style: {
-                itemOpacity: 1,
-              },
-            },
-          ],
-        },
-      ]}
-      role="application"
-      barAriaLabel={function (e) {
-        return e.id + ": " + e.formattedValue + " in country: " + e.indexValue;
-      }}
-    />
-  );
-};
+    <div style={{ width: '100%' }}>
+      {/* <TickParamsSelector
+        tickPlacement={tickPlacement}
+        tickLabelPlacement={tickLabelPlacement}
+        setTickPlacement={setTickPlacement}
+        setTickLabelPlacement={setTickLabelPlacement}
+      /> */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+        {/* </FormControl> */}
+        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+          <InputLabel id="demo-simple-select-standard-label">Year</InputLabel>
+          <Select
+            labelId="demo-simple-select-standard-label"
+            id="demo-simple-select-standard"
+            value={year}
+            // onChange={handleChange}
+            onChange={(event) => setYear(event.target.value)}
 
-export default BarChart;
+            label="Year"
+          >
+            {availableYears.map((yr) => (
+              <MenuItem key={yr} value={yr}>
+                {yr}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+      <XBarChart
+        dataset={data}  // Pass the dynamic data here
+        xAxis={[
+          { scaleType: 'band', dataKey: 'month', tickPlacement, tickLabelPlacement },
+        ]}
+        {...chartSetting}
+      />
+    </div>
+  );
+}
