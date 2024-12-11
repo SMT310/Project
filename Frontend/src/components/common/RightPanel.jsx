@@ -76,7 +76,6 @@ const RightPanel = () => {
 
 	return (
 		<div className="hidden lg:block my-4 mx-2">
-			{/* <div className="sticky top-2 z-20 p-4 rounded-md mb-4"> */}
 			<div
 				className="mb-4 input input-bordered flex items-center gap-2 w-full rounded-full bg-white shadow-lg px-4"
 				ref={inputContainerRef}
@@ -110,13 +109,13 @@ const RightPanel = () => {
 			{showDropdown && (
 				<div
 					ref={dropdownRef}
-					className="absolute bg-white shadow-lg rounded-md max-h-60 overflow-y-auto z-50"
+					className="absolute bg-gray-200 shadow-lg rounded-md max-h-60 overflow-y-auto z-50"
 				>
 					{filteredUsers.length > 0 ? (
 						filteredUsers.map((user) => (
 							<Link
 								to={`/profile/${user.username}`}
-								className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+								className="flex items-center gap-2 p-2 hover:bg-gray-300 cursor-pointer"
 								key={user._id}
 							>
 								<div className="avatar">

@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 
 import LoadingSpinner from "./LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
@@ -111,9 +112,13 @@ const Post = ({ post }) => {
 				});
 			});
 			setComment("");
-			document.getElementById(`comments_modal${post._id}`).close();
+			// document.getElementById(`comments_modal${post._id}`).close();
+			const modal = document.getElementById(`comments_modal${post._id}`);
+			if (modal) {
+				modal.close();
+			}
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
-
+			toast.success("Comment successfully!");
 		},
 		onError: (error) => {
 			toast.error(error.message);
@@ -207,6 +212,13 @@ const Post = ({ post }) => {
 		likePost();
 	};
 
+	const [isExpanded, setIsExpanded] = useState(false); // Track if text is expanded
+	const textLimit = 150; // Set character limit for truncation
+
+	const handleToggleText = () => {
+		setIsExpanded((prev) => !prev);
+	};
+
 	useEffect(() => {
 		if (isEditing) {
 			const modal = document.getElementById("edit_comment_modal");
@@ -236,11 +248,6 @@ const Post = ({ post }) => {
 	return (
 		<>
 			<div className='flex gap-2 items-start p-4 border-b border-gray-300'>
-				{/* <div className='Rounded avatar'>
-					<Link to={`/profile/${postOwner.username}`} className='w-10 h-10 rounded-full overflow-hidden '>
-						<img src={postOwner.profileImg || "/avatar-placeholder.png"} />
-					</Link>
-				</div> */}
 				{/* Avatar Section */}
 				<div className="w-10 h-10 rounded-full overflow-hidden">
 					<Link to={`/profile/${postOwner.username}`}>
@@ -252,24 +259,6 @@ const Post = ({ post }) => {
 					</Link>
 				</div>
 				<div className='flex flex-col flex-1'>
-					{/* <div className='flex gap-2 items-center'>
-						<Link to={`/profile/${postOwner.username}`} className='font-bold text-lg'>
-							{postOwner.fullName}
-						</Link>
-						<span className='text-slate-400 hover:text-sky-400 flex gap-1 text-sm'>
-							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
-							<span> · </span>
-							<span>{formattedDate}</span>
-						</span>
-						{isMyPost && (
-							<span className='flex justify-end flex-1'>
-								{!isDeleting && (
-									<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
-								)}
-								{isDeleting && <LoadingSpinner size='sm' />}
-							</span>
-						)}
-					</div> */}
 					<div className="flex gap-2 items-center">
 						<Link to={`/profile/${postOwner.username}`} className="font-bold text-lg">
 							{postOwner.fullName}
@@ -298,28 +287,79 @@ const Post = ({ post }) => {
 					</div>
 
 					<div className='flex flex-col gap-3 overflow-hidden'>
-						<span className="text-lg">{post.text}</span>
-						{/* {post.img && (
-							<img
-								src={post.img}
-								className='h-80 object-contain rounded-lg border border-gray-700'
-								alt=''
-							/>
-						)} */}
+						{/* <span className="text-lg">{post.text}</span> */}
+						<p className="text-lg">
+							{isExpanded || post.text.length <= textLimit ? (
+								post.text
+							) : (
+								<>
+									{post.text.slice(0, textLimit)}
+									<button
+										className="text-xl text-blue-500 hover:text-black ml-2"
+										onClick={() => setIsExpanded(!isExpanded)}
+									>
+										...Show More
+									</button>
+								</>
+							)}
+							{isExpanded && post.text.length > textLimit && (
+								<button
+									className="text-xl text-blue-500 hover:text-black ml-2"
+									onClick={() => setIsExpanded(!isExpanded)}
+								>
+									Show Less
+								</button>
+							)}
+						</p>
 						{post.img && typeof post.img === 'object' && Object.values(post.img).length > 0 && (
-							<div className="flex flex-wrap gap-3">
+							// <div className="flex flex-wrap gap-3">
+							// 	{Object.values(post.img).map((image, index) => (
+							// 		<img
+							// 			key={index}
+							// 			src={image}
+							// 			className="w-48 h-48 object-cover rounded-lg border border-gray-700"
+							// 			alt={`Post image ${index + 1}`}
+							// 		/>
+							// 	))}
+							// </div>
+							<div
+								className="grid gap-3"
+								style={{
+									gridTemplateColumns: `repeat(${Object.values(post.img).length === 1
+										? 1 // 1 image takes full width
+										: Object.values(post.img).length === 2
+											? 2 // 2 images each take 50% of the width
+											: Object.values(post.img).length === 3
+												? 3 // 3 images each take 33.33% of the width
+												: 4 // 4+ images each take 25% of the width
+										}, 1fr)`,
+								}}
+							>
 								{Object.values(post.img).map((image, index) => (
-									<img
+									<a
 										key={index}
-										src={image}
-										className="w-48 h-48 object-cover rounded-lg border border-gray-700"
-										alt={`Post image ${index + 1}`}
-									/>
+										href={image}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="w-full h-full"
+									>
+										<img
+											src={image}
+											className="object-cover rounded-lg w-full h-full border border-gray-700"
+											alt={`Post image ${index + 1}`}
+											style={{
+												width: "100%",
+												height: "100%",
+												maxWidth: Object.values(post.img).length === 1 ? "100%" : "300px", // 100% width for 1 image, 300px for others
+												maxHeight: "300px", // Maximum height for each image
+											}}
+										/>
+									</a>
 								))}
 							</div>
 						)}
 					</div>
-					<div className='flex justify-between mt-3'>
+					<div className='flex justify-between items-center mt-3'>
 						{/* Left Section with Like Icon */}
 						<div className='flex items-center gap-4'>
 							<div className='flex gap-1 items-center cursor-pointer group' onClick={handleLikePost}>
@@ -344,31 +384,38 @@ const Post = ({ post }) => {
 						</div>
 
 						{/* Center Section with Comment Icon */}
-						<div className='flex items-center gap-4'>
+						<div className='flex items-center justify-center flex-1'>
 							<div
 								className='flex gap-1 items-center cursor-pointer group'
 								onClick={() => document.getElementById("comments_modal" + post._id).showModal()}
 							>
 								<FaComments className='w-4 h-4 text-slate-500 group-hover:text-sky-400' />
-								<span className='text-sm text-slate-500 group-hover:text-sky-400'>
-									{post.comments.length}
-								</span>
+								<span className='text-sm text-slate-500 group-hover:text-sky-400'>{post.comments.length}</span>
 							</div>
 						</div>
 
 						{/* Optional Right Section for Additional Icons */}
-						<div className='flex items-center gap-4'>
-							{/* Any additional icons can go here */}
-							<div className='flex gap-1 items-center group cursor-pointer'>
+						{/* <div className='flex items-center gap-4'> */}
+						{/* Any additional icons can go here */}
+						{/* <div className='flex gap-1 items-center group cursor-pointer'>
 								<FaRegShareFromSquare className='w-6 h-6  text-slate-500 group-hover:text-green-500' />
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
-							</div>
-						</div>
+							</div> */}
+						{/* </div> */}
 
 						{/* Comments Modal */}
 						<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
 							<div className='modal-box rounded border border-gray-600'>
-								<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
+								<div className='flex justify-between items-center'>
+									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
+									<button
+										className='text-gray-500 hover:text-gray-700'
+										onClick={() => document.getElementById(`comments_modal${post._id}`).close()}
+									>
+										<FaTimes className='w-5 h-5' />
+									</button>
+								</div>
+
 								<div className='flex flex-col gap-3 max-h-60 overflow-auto'>
 									{post.comments.length === 0 && (
 										<p className='text-sm text-slate-500'>
@@ -400,11 +447,11 @@ const Post = ({ post }) => {
 														/>
 													</div>
 												)}
-
 											</div>
 										</div>
 									))}
 								</div>
+
 								<form className='flex gap-2 items-center mt-4 border-t border-gray-600 pt-2' onSubmit={handlePostComment}>
 									<textarea
 										className='textarea w-full p-1 rounded text-md resize-none border focus:outline-none border-gray-800'
@@ -421,10 +468,13 @@ const Post = ({ post }) => {
 									</button>
 								</form>
 							</div>
-							<form method='dialog' className='modal-backdrop'>
+
+							{/* Backdrop */}
+							<form method='dialog' className='modal-backdrop' onClick={() => document.getElementById(`comments_modal${post._id}`).close()}>
 								<button className='outline-none'>close</button>
 							</form>
 						</dialog>
+
 					</div>
 				</div>
 			</div >
