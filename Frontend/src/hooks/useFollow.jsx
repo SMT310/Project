@@ -33,7 +33,12 @@ const useFollow = () => {
 			]);
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 

@@ -9,11 +9,14 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Header from "../../components/Header";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
 
   const { data: allUserAdmin, isLoading, error } = useQuery({
     queryKey: ["allUserAdmin"],
@@ -53,13 +56,20 @@ const Team = () => {
       }
     },
     onSuccess: () => {
-      toast.success("User deleted successfully");
+      toast.success("User deleted successfully", {
+        style: {
+          background: "#1E90FF", // Light blue
+          color: "#FFFFFF",      // White text
+        },
+      });
       queryClient.invalidateQueries({ queryKey: ["allUserAdmin"] });
+      navigate("/team");
     },
   });
 
   const handleDelete = (row) => {
     deleteUser(row.id);
+    window.location.reload();
   };
 
   const columns = [

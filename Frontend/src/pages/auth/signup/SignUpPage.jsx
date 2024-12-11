@@ -41,7 +41,12 @@ const SignUpPage = () => {
 			}
 		},
 		onSuccess: () => {
-			toast.success("Account created successfully");
+			toast.success("Account created successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			queryClient.invalidateQueries({ queryKey: ["authUser"] });
 		},
 	});

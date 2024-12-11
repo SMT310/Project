@@ -21,7 +21,10 @@ const Post = ({ post }) => {
 	const isMyPost = authUser._id === post.user._id;
 
 	const formattedDate = formatPostDate(post.createdAt);
-	
+
+	const [isExpanded, setIsExpanded] = useState(false); // Track if text is expanded
+	const textLimit = 150; // Set character limit for truncation
+
 	const { mutate: deletePost, isPending: isDeleting } = useMutation({
 		mutationFn: async () => {
 			try {
@@ -39,7 +42,12 @@ const Post = ({ post }) => {
 			}
 		},
 		onSuccess: () => {
-			toast.success("Post deleted successfully");
+			toast.success("Post deleted successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 	});
@@ -70,7 +78,12 @@ const Post = ({ post }) => {
 			});
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 
@@ -107,7 +120,12 @@ const Post = ({ post }) => {
 			document.getElementById(`comments_modal${post._id}`).close();
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 
@@ -124,37 +142,63 @@ const Post = ({ post }) => {
 	const handleLikePost = () => {
 		if (isLiking) return;
 		likePost();
-	 };
+	};
 
 	return (
 		<>
 			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
-				<div className='avatar'>
-					<Link to={`/profile/${postOwner.username}`} className='w-8 rounded-full overflow-hidden '>
-						<img src={postOwner.profileImg || "/avatar-placeholder.png"} />
-					</Link>
+				{/* <div className='avatar'> */}
+				<div className="w-10 h-10 rounded-full overflow-hidden">
+					<a to={`/profile/${postOwner.username}`}>
+						<img src={postOwner.profileImg || "/avatar-placeholder.png"}
+							className="w-full h-full object-cover rounded-full"
+							alt="User Avatar"
+						/>
+					</a>
 				</div>
 				<div className='flex flex-col flex-1'>
 					<div className='flex gap-2 items-center'>
-						<Link to={`/profile/${postOwner.username}`} className='font-bold'>
+						<a to={`/profile/${postOwner.username}`} className='font-bold text-lg'>
 							{postOwner.fullName}
-						</Link>
+						</a>
 						<span className='text-slate-400 hover:text-sky-400 flex gap-1 text-sm'>
-							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
+							<a to={`/profile/${postOwner.username}`}>@{postOwner.username}</a>
 							<span> · </span>
-							<span>{formattedDate}</span>
 						</span>
+						<span>{formattedDate}</span>
 						{/* {isMyPost && ( */}
-							<span className='flex justify-end flex-1'>
-								{!isDeleting && (
-									<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
-								)}
-								{isDeleting && <LoadingSpinner size='sm' />}
-							</span>
+						<span className='flex justify-end flex-1'>
+							{!isDeleting && (
+								<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
+							)}
+							{isDeleting && <LoadingSpinner size='sm' />}
+						</span>
 						{/* )} */}
 					</div>
 					<div className='flex flex-col gap-3 overflow-hidden text-left'>
-						<span>{post.text}</span>
+						<p className="text-lg">
+							{isExpanded || post.text.length <= textLimit ? (
+								post.text
+							) : (
+								<>
+									{post.text.slice(0, textLimit)}
+									<button
+										className="text-xl text-blue-500 hover:text-black ml-2"
+										onClick={() => setIsExpanded(!isExpanded)}
+									>
+										...Show More
+									</button>
+								</>
+							)}
+							{isExpanded && post.text.length > textLimit && (
+								<button
+									className="text-xl text-blue-500 hover:text-black ml-2"
+									onClick={() => setIsExpanded(!isExpanded)}
+								>
+									Show Less
+								</button>
+							)}
+						</p>
 						{/* {post.img && (
 							<img
 								src={post.img}
@@ -163,14 +207,49 @@ const Post = ({ post }) => {
 							/>
 						)} */}
 						{post.img && typeof post.img === 'object' && Object.values(post.img).length > 0 && (
-							<div className="flex flex-wrap gap-3">
+							// <div className="flex flex-wrap gap-3">
+							// 	{Object.values(post.img).map((image, index) => (
+							// 		<img
+							// 			key={index}
+							// 			src={image}
+							// 			className="w-48 h-48 object-cover rounded-lg border border-gray-700"
+							// 			alt={`Post image ${index + 1}`}
+							// 		/>
+							// 	))}
+							// </div>
+							<div
+								className="grid gap-3"
+								style={{
+									gridTemplateColumns: `repeat(${Object.values(post.img).length === 1
+										? 1 // 1 image takes full width
+										: Object.values(post.img).length === 2
+											? 2 // 2 images each take 50% of the width
+											: Object.values(post.img).length === 3
+												? 3 // 3 images each take 33.33% of the width
+												: 4 // 4+ images each take 25% of the width
+										}, 1fr)`,
+								}}
+							>
 								{Object.values(post.img).map((image, index) => (
-									<img
+									<a
 										key={index}
-										src={image}
-										className="w-48 h-48 object-cover rounded-lg border border-gray-700"
-										alt={`Post image ${index + 1}`}
-									/>
+										href={image}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="w-full h-full"
+									>
+										<img
+											src={image}
+											className="object-cover rounded-lg w-full h-full border border-gray-700"
+											alt={`Post image ${index + 1}`}
+											style={{
+												width: "100%",
+												height: "100%",
+												maxWidth: Object.values(post.img).length === 1 ? "100%" : "300px", // 100% width for 1 image, 300px for others
+												maxHeight: "350px", // Maximum height for each image
+											}}
+										/>
+									</a>
 								))}
 							</div>
 						)}
@@ -189,8 +268,8 @@ const Post = ({ post }) => {
 									<AiFillLike className='w-4 h-4 cursor-pointer text-pink-500' />
 								)} */}
 
-								{/* Display like count with appropriate styles */}
-								{/* <span
+							{/* Display like count with appropriate styles */}
+							{/* <span
 									className={`text-sm group-hover:text-pink-500 ${
 										isLiked ? "text-pink-500" : "text-slate-500"
 										}`}
@@ -215,8 +294,8 @@ const Post = ({ post }) => {
 
 						{/* Optional Right Section for Additional Icons */}
 						{/* <div className='flex items-center gap-4'> */}
-							{/* Any additional icons can go here */}
-							{/* <div className='flex gap-1 items-center group cursor-pointer'>
+						{/* Any additional icons can go here */}
+						{/* <div className='flex gap-1 items-center group cursor-pointer'>
 								<FaRegShareFromSquare className='w-6 h-6  text-slate-500 group-hover:text-green-500' />
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div> */}

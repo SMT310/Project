@@ -35,7 +35,12 @@ const CreatePost = () => {
 		onSuccess: () => {
 			setText("");
 			setImages([]);
-			toast.success("Post created successfully");
+			toast.success("Post created successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 	});

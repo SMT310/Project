@@ -44,10 +44,20 @@ const useUpdateUserProfile = () => {
 				queryClient.invalidateQueries({ queryKey: ["authUser"] }),
 			]);
 
-			toast.success("Profile updated successfully");
+			toast.success("Profile updated successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 

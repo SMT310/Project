@@ -46,11 +46,21 @@ const NotificationPage = () => {
 			}
 		},
 		onSuccess: () => {
-			toast.success("Notifications deleted successfully");
+			toast.success("Notifications deleted successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			queryClient.invalidateQueries({ queryKey: ["notifications"] });
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 

@@ -47,7 +47,12 @@ const Post = ({ post }) => {
 			}
 		},
 		onSuccess: () => {
-			toast.success("Post deleted successfully");
+			toast.success("Post deleted successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 	});
@@ -78,7 +83,12 @@ const Post = ({ post }) => {
 			});
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 
@@ -118,10 +128,20 @@ const Post = ({ post }) => {
 				modal.close();
 			}
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
-			toast.success("Comment successfully!");
+			toast.success("Comment successfully!", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 
@@ -153,12 +173,22 @@ const Post = ({ post }) => {
 					return p;
 				});
 			});
-			toast.success("Comment updated successfully!");
+			toast.success("Comment updated successfully!", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			setIsEditing(false); // Close modal
 			setEditingComment(null); // Clear editing state
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 
@@ -187,12 +217,22 @@ const Post = ({ post }) => {
 					return p;
 				});
 			});
-			toast.success("Comment deleted successfully");
+			toast.success("Comment deleted successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			setComment("");
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(error.message, {
+				style: {
+					background: "#B22222", // Firebrick (deep red)
+					color: "#FFFFFF",      // White text for contrast
+				},
+			});
 		},
 	});
 
@@ -263,16 +303,16 @@ const Post = ({ post }) => {
 						<Link to={`/profile/${postOwner.username}`} className="font-bold text-lg">
 							{postOwner.fullName}
 						</Link>
-						<div className="flex gap-1 text-sm text-slate-400">
+						<div className="text-slate-400 hover:text-sky-400 flex gap-1 text-sm">
 							<Link
 								to={`/profile/${postOwner.username}`}
-								className="hover:text-sky-400"
+							// className="hover:text-sky-400"
 							>
 								@{postOwner.username}
 							</Link>
 							<span> · </span>
-							<span className="hover:text-sky-300">{formattedDate}</span>
 						</div>
+						<span>{formattedDate}</span>
 						{isMyPost && (
 							<span className="flex justify-end flex-1">
 								{!isDeleting && (

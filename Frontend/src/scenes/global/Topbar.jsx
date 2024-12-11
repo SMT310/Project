@@ -32,13 +32,23 @@ const Topbar = () => {
       }
     },
     onSuccess: () => {
-      toast.success("Logout successfully");
+      toast.success("Logout successfully", {
+        style: {
+          background: "#1E90FF", // Light blue
+          color: "#FFFFFF",      // White text
+        },
+      });
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
       navigate("/login");
       localStorage.removeItem("authUser");
     },
     onError: () => {
-      toast.error("Logout failed");
+      toast.error("Logout failed", {
+        style: {
+          background: "#B22222", // Firebrick (deep red)
+          color: "#FFFFFF",      // White text for contrast
+        },
+      });
     },
   });
 

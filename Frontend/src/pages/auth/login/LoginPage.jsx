@@ -39,7 +39,12 @@ const LoginPage = () => {
 			}
 		},
 		onSuccess: () => {
-			toast.success("Login successfully");
+			toast.success("Login successfully", {
+				style: {
+					background: "#1E90FF", // Light blue
+					color: "#FFFFFF",      // White text
+				},
+			});
 			queryClient.invalidateQueries({ queryKey: ["authUser"] });
 		},
 	});

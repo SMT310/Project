@@ -31,7 +31,7 @@ const Form = () => {
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to create account");
-        
+
         console.log("New account: ", data);
 
         return data;
@@ -41,11 +41,16 @@ const Form = () => {
       }
     },
     onSuccess: () => {
-      toast.success("Account created successfully");
+      toast.success("Account created successfully", {
+        style: {
+          background: "#1E90FF", // Light blue
+          color: "#FFFFFF",      // White text
+        },
+      });
       // Optionally, invalidate queries if you need to refresh a list of users
       // queryClient.invalidateQueries(["allUserAdmin"]);
       queryClient.invalidateQueries(["allUserAdmin"]);
-			navigate("/team");
+      navigate("/team");
     },
   });
 
