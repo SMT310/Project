@@ -8,7 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
-
+import Linkify from 'react-linkify';
 import LoadingSpinner from "./LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
 
@@ -30,6 +30,11 @@ const Post = ({ post }) => {
 	const isMyPost = authUser._id === post.user._id;
 	const formattedDate = formatPostDate(post.createdAt);
 
+	const customLinkDecorator = (href, text, key) => (
+		<a href={href} key={key} style={{ color: 'blue', textDecoration: 'underline' }}>
+			{text}
+		</a>
+	);
 	const { mutate: deletePost, isPending: isDeleting } = useMutation({
 		mutationFn: async () => {
 			try {
@@ -328,28 +333,30 @@ const Post = ({ post }) => {
 
 					<div className='flex flex-col gap-3 overflow-hidden'>
 						{/* <span className="text-lg">{post.text}</span> */}
-						<p className="text-lg">
-							{isExpanded || post.text.length <= textLimit ? (
-								post.text
-							) : (
-								<>
-									{post.text.slice(0, textLimit)}
+						<p className="text-lg" style={{ whiteSpace: 'pre-wrap' }}>
+							<Linkify componentDecorator={customLinkDecorator}>
+								{isExpanded || post.text.length <= textLimit ? (
+									post.text
+								) : (
+									<>
+										{post.text.slice(0, textLimit)}
+										<button
+											className="text-xl text-blue-500 hover:text-black ml-2"
+											onClick={() => setIsExpanded(!isExpanded)}
+										>
+											...Show More
+										</button>
+									</>
+								)}
+								{isExpanded && post.text.length > textLimit && (
 									<button
 										className="text-xl text-blue-500 hover:text-black ml-2"
 										onClick={() => setIsExpanded(!isExpanded)}
 									>
-										...Show More
+										Show Less
 									</button>
-								</>
-							)}
-							{isExpanded && post.text.length > textLimit && (
-								<button
-									className="text-xl text-blue-500 hover:text-black ml-2"
-									onClick={() => setIsExpanded(!isExpanded)}
-								>
-									Show Less
-								</button>
-							)}
+								)}
+							</Linkify>
 						</p>
 						{post.img && typeof post.img === 'object' && Object.values(post.img).length > 0 && (
 							// <div className="flex flex-wrap gap-3">

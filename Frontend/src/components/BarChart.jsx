@@ -75,20 +75,52 @@ export default function UserCountBarChart() {
       });
   }, [year]);
 
+  // const chartSetting = {
+  //   yAxis: [
+  //     {
+  //       label: 'User Count',
+  //     },
+  //   ],
+  //   series: [{ dataKey: 'users', label: 'Account Created', valueFormatter }],
+  //   height: 300,
+  //   sx: {
+  //     [`& .${axisClasses.directionY} .${axisClasses.label}`]: {
+  //       transform: 'translateX(-10px)',
+  //     },
+  //   },
+  // };
+  // Fixed chart height
+  const chartHeight = 300; // Fixed height for the chart (adjust as needed)
+
+  // Maximum number of users (this is to scale the bars appropriately, you can adjust this based on your data range)
+  const maxUserCount = Math.max(...data.map(item => item.users), 1);
+
+  // Scale the bars proportionally (you can adjust this scaling factor as needed)
+  const scaleFactor = chartHeight / maxUserCount;
+
   const chartSetting = {
     yAxis: [
       {
-        label: 'User Count',
+        label: "User Count",
+        valueFormatter: (value) => value.toFixed(0), // Ensure integer values on the Y-axis
       },
     ],
-    series: [{ dataKey: 'users', label: 'Account Created', valueFormatter }],
-    height: 300,
+    series: [
+      {
+        dataKey: "users",
+        label: "Account Created",
+        valueFormatter: (value) => value.toFixed(0), // Display the user count as an integer
+        barHeight: (data) => data.users * scaleFactor, // Apply scaleFactor to each bar's height
+      },
+    ],
+    height: chartHeight, // Fixed height for the entire chart
     sx: {
       [`& .${axisClasses.directionY} .${axisClasses.label}`]: {
-        transform: 'translateX(-10px)',
+        transform: "translateX(-10px)",
       },
     },
   };
+
 
   return (
     <div style={{ width: '100%' }}>

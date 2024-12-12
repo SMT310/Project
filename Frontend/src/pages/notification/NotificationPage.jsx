@@ -12,10 +12,34 @@ import { FaUser } from "react-icons/fa";
 import { AiFillLike } from "react-icons/ai";
 import { IoTrashBin } from "react-icons/io5";
 import { BiSolidComment } from "react-icons/bi";
-
+import { useState, useEffect } from "react";
 const NotificationPage = () => {
 	const queryClient = useQueryClient();
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+	const [showScrollButton, setShowScrollButton] = useState(false);
+
+	// Show or hide the "Return to Top" button based on scroll position
+	const checkScrollPosition = () => {
+		if (window.scrollY > 300) {
+			setShowScrollButton(true);
+		} else {
+			setShowScrollButton(false);
+		}
+	};
+	// Add event listener for scroll
+	useEffect(() => {
+		window.addEventListener("scroll", checkScrollPosition);
+		return () => {
+			window.removeEventListener("scroll", checkScrollPosition);
+		};
+	}, []);
+	// Scroll to top function
+	const scrollToTop = () => {
+		window.scrollTo({
+			top: 0,
+			behavior: "smooth",
+		});
+	};
 
 	const { data: notifications, isLoading } = useQuery({
 		queryKey: ["notifications"],
@@ -179,6 +203,15 @@ const NotificationPage = () => {
 			<div className='flex max-w-6xl mx-auto p-0'>
 				<RightPanel />
 			</div>
+			{/* Return to top button */}
+			{showScrollButton && (
+				<button
+					onClick={scrollToTop}
+					className="fixed bottom-4 right-4 bg-blue-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-400 transition"
+				>
+					↑
+				</button>
+			)}
 		</>
 	);
 };

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import Linkify from 'react-linkify';
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
@@ -24,6 +25,8 @@ const Post = ({ post }) => {
 
 	const [isExpanded, setIsExpanded] = useState(false); // Track if text is expanded
 	const textLimit = 150; // Set character limit for truncation
+	
+	const customLinkDecorator = (href, text, key) => (<a href={href} key={key} style={{ color: 'blue', textDecoration: 'underline' }}> {text} </a>);
 
 	const { mutate: deletePost, isPending: isDeleting } = useMutation({
 		mutationFn: async () => {
@@ -177,6 +180,7 @@ const Post = ({ post }) => {
 					</div>
 					<div className='flex flex-col gap-3 overflow-hidden text-left'>
 						<p className="text-lg">
+							<Linkify componentDecorator={customLinkDecorator}>
 							{isExpanded || post.text.length <= textLimit ? (
 								post.text
 							) : (
@@ -197,7 +201,8 @@ const Post = ({ post }) => {
 								>
 									Show Less
 								</button>
-							)}
+								)}
+							</Linkify>
 						</p>
 						{/* {post.img && (
 							<img

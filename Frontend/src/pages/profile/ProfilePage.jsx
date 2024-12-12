@@ -34,6 +34,31 @@ const ProfilePage = () => {
 	const { follow, isPending } = useFollow();
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
+	const [showScrollButton, setShowScrollButton] = useState(false);
+
+	// Show or hide the "Return to Top" button based on scroll position
+	const checkScrollPosition = () => {
+		if (window.scrollY > 300) {
+			setShowScrollButton(true);
+		} else {
+			setShowScrollButton(false);
+		}
+	};
+	// Add event listener for scroll
+	useEffect(() => {
+		window.addEventListener("scroll", checkScrollPosition);
+		return () => {
+			window.removeEventListener("scroll", checkScrollPosition);
+		};
+	}, []);
+	// Scroll to top function
+	const scrollToTop = () => {
+		window.scrollTo({
+			top: 0,
+			behavior: "smooth",
+		});
+	};
+
 	const { data: user, isLoading, refetch, isRefetching } = useQuery({
 		queryKey: ["userProfile"],
 		queryFn: async () => {
@@ -189,7 +214,8 @@ const ProfilePage = () => {
 											<>
 												<FaLink className='w-3 h-3 text-slate-500' />
 												<a
-													href='https://youtube.com/@asaprogrammer_'
+													// href={user?.link}
+													href={user?.link.startsWith("http") ? user?.link : `https://${user?.link}`}
 													target='_blank'
 													rel='noreferrer'
 													className='text-sm text-blue-500 hover:underline'
@@ -247,6 +273,15 @@ const ProfilePage = () => {
 			<div className='flex max-w-6xl mx-auto p-0'>
 				<RightPanel />
 			</div>
+			{/* Return to top button */}
+			{showScrollButton && (
+				<button
+					onClick={scrollToTop}
+					className="fixed bottom-4 right-4 bg-blue-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-400 transition"
+				>
+					↑
+				</button>
+			)}
 		</>
 	);
 };
