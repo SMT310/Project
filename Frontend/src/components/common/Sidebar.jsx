@@ -128,7 +128,7 @@ const Sidebar = () => {
 
 						{/* Logout icon */}
 						<BiLogOut
-							className="w-5 h-5 cursor-pointer transition-transform transform hover:translate-x-2 hover:text-red-500"
+							className="w-5 h-5 cursor-pointer transition-transform transform hover:translate-x-2 hover:text-red-500 ml-auto"
 							onClick={(e) => {
 								e.preventDefault();
 								logout();

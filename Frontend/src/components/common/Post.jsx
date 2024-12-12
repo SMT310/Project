@@ -481,7 +481,7 @@ const Post = ({ post }) => {
 													<span className='font-bold'>{comment.user.fullName}</span>
 													<span className='text-gray-700 text-sm'>@{comment.user.username}</span>
 												</div>
-												<div className='text-sm'>{comment.text}</div>
+												<div className='text-sm' style={{ whiteSpace: 'pre-wrap' }}>{comment.text}</div>
 												{comment.user._id === authUser._id && (
 													<div className="flex justify-end gap-2 absolute top-0 right-0">
 														<FaEdit
